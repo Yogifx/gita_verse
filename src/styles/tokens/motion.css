@@ -1,0 +1,21 @@
+/* --------------------------------------------------------------------------
+ * GitaVerse — Motion Tokens
+ * -------------------------------------------------------------------------- */
+
+:root {
+  --duration-instant: 0ms;
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-slower: 600ms;
+
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  --ease-entrance: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* Semantic aliases */
+  --motion-hover: var(--duration-fast) var(--ease-standard);
+  --motion-panel: var(--duration-normal) var(--ease-emphasized);
+  --motion-page: var(--duration-slow) var(--ease-entrance);
+}

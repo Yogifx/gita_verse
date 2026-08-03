@@ -1,0 +1,54 @@
+/* --------------------------------------------------------------------------
+ * GitaVerse — Light Theme (Future Support)
+ * Activated via [data-theme="light"] on <html> or a root wrapper.
+ * -------------------------------------------------------------------------- */
+
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Brand accents */
+  --color-primary: var(--gv-gold-600);
+  --color-primary-hover: var(--gv-gold-500);
+  --color-primary-muted: color-mix(in srgb, var(--gv-gold-600) 12%, transparent);
+
+  --color-secondary: var(--gv-indigo-600);
+  --color-secondary-hover: var(--gv-indigo-500);
+  --color-secondary-muted: color-mix(in srgb, var(--gv-indigo-600) 12%, transparent);
+
+  /* Surfaces */
+  --color-background: var(--gv-ink-50);
+  --color-surface: #ffffff;
+  --color-surface-elevated: #ffffff;
+  --color-muted: var(--gv-ink-100);
+
+  /* Feedback */
+  --color-success: var(--gv-green-600);
+  --color-success-muted: color-mix(in srgb, var(--gv-green-600) 12%, transparent);
+  --color-warning: var(--gv-amber-600);
+  --color-warning-muted: color-mix(in srgb, var(--gv-amber-600) 12%, transparent);
+  --color-danger: var(--gv-red-600);
+  --color-danger-muted: color-mix(in srgb, var(--gv-red-600) 12%, transparent);
+
+  /* Text */
+  --color-text-primary: var(--gv-ink-900);
+  --color-text-secondary: var(--gv-ink-500);
+  --color-text-muted: var(--gv-ink-400);
+  --color-text-inverse: var(--gv-ink-50);
+  --color-text-on-primary: var(--gv-ink-50);
+
+  /* Borders & brand pigments */
+  --color-border: var(--gv-ink-200);
+  --color-border-strong: var(--gv-ink-300);
+  --color-gold: var(--gv-gold-600);
+  --color-indigo: var(--gv-indigo-600);
+
+  /* Focus */
+  --color-ring: var(--gv-gold-600);
+
+  /* Theme-aware shadows (softer on light) */
+  --shadow-xs: 0 1px 2px rgb(22 28 46 / 0.06);
+  --shadow-sm: 0 2px 8px rgb(22 28 46 / 0.08);
+  --shadow-md: 0 8px 24px rgb(22 28 46 / 0.1);
+  --shadow-lg: 0 16px 40px rgb(22 28 46 / 0.12);
+  --shadow-xl: 0 24px 56px rgb(22 28 46 / 0.14);
+}

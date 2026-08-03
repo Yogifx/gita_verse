@@ -1,0 +1,54 @@
+/* --------------------------------------------------------------------------
+ * GitaVerse — Dark Theme (Default)
+ * -------------------------------------------------------------------------- */
+
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Brand accents */
+  --color-primary: var(--gv-gold-400);
+  --color-primary-hover: var(--gv-gold-300);
+  --color-primary-muted: color-mix(in srgb, var(--gv-gold-400) 16%, transparent);
+
+  --color-secondary: var(--gv-indigo-400);
+  --color-secondary-hover: var(--gv-indigo-300);
+  --color-secondary-muted: color-mix(in srgb, var(--gv-indigo-400) 18%, transparent);
+
+  /* Surfaces */
+  --color-background: var(--gv-ink-900);
+  --color-surface: var(--gv-ink-800);
+  --color-surface-elevated: var(--gv-ink-700);
+  --color-muted: var(--gv-ink-600);
+
+  /* Feedback */
+  --color-success: var(--gv-green-500);
+  --color-success-muted: color-mix(in srgb, var(--gv-green-500) 16%, transparent);
+  --color-warning: var(--gv-amber-500);
+  --color-warning-muted: color-mix(in srgb, var(--gv-amber-500) 16%, transparent);
+  --color-danger: var(--gv-red-500);
+  --color-danger-muted: color-mix(in srgb, var(--gv-red-500) 16%, transparent);
+
+  /* Text */
+  --color-text-primary: var(--gv-ink-50);
+  --color-text-secondary: var(--gv-ink-300);
+  --color-text-muted: var(--gv-ink-400);
+  --color-text-inverse: var(--gv-ink-900);
+  --color-text-on-primary: var(--gv-ink-900);
+
+  /* Borders & brand pigments */
+  --color-border: var(--gv-ink-600);
+  --color-border-strong: var(--gv-ink-500);
+  --color-gold: var(--gv-gold-400);
+  --color-indigo: var(--gv-indigo-400);
+
+  /* Focus */
+  --color-ring: var(--gv-gold-400);
+
+  /* Theme-aware shadows (darker ink) */
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.35);
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 0.45);
+  --shadow-lg: 0 16px 40px rgb(0 0 0 / 0.5);
+  --shadow-xl: 0 24px 56px rgb(0 0 0 / 0.55);
+}

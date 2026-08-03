@@ -1,0 +1,43 @@
+/* --------------------------------------------------------------------------
+ * GitaVerse — Typography Tokens
+ * -------------------------------------------------------------------------- */
+
+:root {
+  /* Font families — --font-* from next/font when available */
+  --font-display: var(--font-cormorant), "Cormorant Garamond",
+    "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --font-sans: var(--font-outfit), "Outfit", "Avenir Next", "Segoe UI",
+    sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", "SFMono-Regular", Menlo,
+    Consolas, monospace;
+
+  /* Font sizes */
+  --text-display: 3.5rem; /* 56px */
+  --text-h1: 2.5rem; /* 40px */
+  --text-h2: 2rem; /* 32px */
+  --text-h3: 1.5rem; /* 24px */
+  --text-body-lg: 1.125rem; /* 18px */
+  --text-body: 1rem; /* 16px */
+  --text-caption: 0.875rem; /* 14px */
+  --text-small: 0.75rem; /* 12px */
+
+  /* Line heights */
+  --leading-display: 1.1;
+  --leading-heading: 1.2;
+  --leading-body: 1.6;
+  --leading-tight: 1.35;
+  --leading-caption: 1.4;
+
+  /* Font weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* Letter spacing */
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.015em;
+  --tracking-body: 0;
+  --tracking-caption: 0.01em;
+  --tracking-wide: 0.04em;
+}

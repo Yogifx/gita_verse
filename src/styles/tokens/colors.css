@@ -1,0 +1,53 @@
+/* --------------------------------------------------------------------------
+ * GitaVerse — Primitive Color Tokens
+ * Raw brand pigments. Prefer semantic tokens in UI.
+ * -------------------------------------------------------------------------- */
+
+:root {
+  /* Gold */
+  --gv-gold-50: #fbf6e9;
+  --gv-gold-100: #f5ebcc;
+  --gv-gold-200: #ead79a;
+  --gv-gold-300: #dbc05f;
+  --gv-gold-400: #c9a54e;
+  --gv-gold-500: #b08d3a;
+  --gv-gold-600: #8f702c;
+  --gv-gold-700: #6f5623;
+  --gv-gold-800: #4f3d1a;
+  --gv-gold-900: #322610;
+
+  /* Indigo */
+  --gv-indigo-50: #eef1f8;
+  --gv-indigo-100: #d7deee;
+  --gv-indigo-200: #b0bddc;
+  --gv-indigo-300: #8496c4;
+  --gv-indigo-400: #5b6c9f;
+  --gv-indigo-500: #455687;
+  --gv-indigo-600: #36446c;
+  --gv-indigo-700: #2e3a5f;
+  --gv-indigo-800: #222b46;
+  --gv-indigo-900: #161c2e;
+
+  /* Ink (neutrals) */
+  --gv-ink-50: #f4f5f8;
+  --gv-ink-100: #e6e8ee;
+  --gv-ink-200: #c7cbd6;
+  --gv-ink-300: #9aa3b5;
+  --gv-ink-400: #6b7285;
+  --gv-ink-500: #4b5160;
+  --gv-ink-600: #2a3145;
+  --gv-ink-700: #1a1f2e;
+  --gv-ink-800: #141824;
+  --gv-ink-900: #0c0e14;
+
+  /* Feedback primitives */
+  --gv-green-400: #5fb384;
+  --gv-green-500: #4a9b6e;
+  --gv-green-600: #3a7d58;
+  --gv-amber-400: #d4a04e;
+  --gv-amber-500: #c4893a;
+  --gv-amber-600: #a06e2e;
+  --gv-red-400: #d47474;
+  --gv-red-500: #c45c5c;
+  --gv-red-600: #a34848;
+}

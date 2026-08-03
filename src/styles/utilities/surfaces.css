@@ -1,0 +1,39 @@
+/* Mirrored in src/styles/globals.css @layer utilities — keep in sync. */
+
+.surface {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+}
+
+.surface-elevated {
+  background-color: var(--color-surface-elevated);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  box-shadow: var(--shadow-panel);
+}
+
+.panel {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  padding: var(--space-6);
+}
+
+.divider {
+  height: 1px;
+  width: 100%;
+  background-color: var(--color-border);
+  border: 0;
+}
+
+.transition-standard {
+  transition: var(--motion-hover);
+}
+
+.transition-panel {
+  transition: var(--motion-panel);
+}

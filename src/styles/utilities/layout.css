@@ -1,0 +1,76 @@
+/* Mirrored in src/styles/globals.css @layer utilities — keep in sync. */
+
+.stack-xs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.stack-sm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.stack-md {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.stack-xl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.cluster-sm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.cluster-md {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.cluster-lg {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.inset-sm {
+  padding: var(--space-3);
+}
+
+.inset-md {
+  padding: var(--space-4);
+}
+
+.inset-lg {
+  padding: var(--space-6);
+}
+
+.inset-xl {
+  padding: var(--space-8);
+}
+
+.section-y {
+  padding-block: var(--space-section);
+}
+
+.gutter-x {
+  padding-inline: var(--space-gutter);
+}

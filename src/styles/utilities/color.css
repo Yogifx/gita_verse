@@ -1,0 +1,86 @@
+/* Mirrored in src/styles/globals.css @layer utilities — keep in sync. */
+
+.bg-background {
+  background-color: var(--color-background);
+}
+
+.bg-surface {
+  background-color: var(--color-surface);
+}
+
+.bg-surface-elevated {
+  background-color: var(--color-surface-elevated);
+}
+
+.bg-muted {
+  background-color: var(--color-muted);
+}
+
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-secondary {
+  background-color: var(--color-secondary);
+}
+
+.bg-success-muted {
+  background-color: var(--color-success-muted);
+}
+
+.bg-warning-muted {
+  background-color: var(--color-warning-muted);
+}
+
+.bg-danger-muted {
+  background-color: var(--color-danger-muted);
+}
+
+.fg-primary {
+  color: var(--color-text-primary);
+}
+
+.fg-secondary {
+  color: var(--color-text-secondary);
+}
+
+.fg-muted {
+  color: var(--color-text-muted);
+}
+
+.fg-accent {
+  color: var(--color-primary);
+}
+
+.fg-indigo {
+  color: var(--color-indigo);
+}
+
+.fg-gold {
+  color: var(--color-gold);
+}
+
+.fg-success {
+  color: var(--color-success);
+}
+
+.fg-warning {
+  color: var(--color-warning);
+}
+
+.fg-danger {
+  color: var(--color-danger);
+}
+
+.border-default {
+  border-color: var(--color-border);
+}
+
+.border-strong {
+  border-color: var(--color-border-strong);
+}
+
+.ring-focus {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+}

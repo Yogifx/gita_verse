@@ -1,0 +1,9 @@
+/*
+ * Utility modules are compiled via src/styles/globals.css (@layer utilities)
+ * so Tailwind can bind the layer. Keep these files as the readable source;
+ * mirror changes into globals.css until a PostCSS inline pipeline is added.
+ */
+@import "./typography.css";
+@import "./color.css";
+@import "./layout.css";
+@import "./surfaces.css";
