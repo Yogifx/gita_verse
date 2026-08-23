@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Menu, Moon, Search, Sun } from "lucide-react";
 import { APP_NAME } from "@/constants/navigation";
 import { useShellStore } from "@/stores/shell-store";
@@ -20,6 +21,7 @@ export function Header() {
   const toggleTheme = useShellStore((s) => s.toggleTheme);
   const displayName = useSettingsStore((s) => s.displayName);
   const role = useSettingsStore((s) => s.role);
+  const email = useSettingsStore((s) => s.email);
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-surface px-4 md:px-6">
@@ -70,13 +72,14 @@ export function Header() {
         )}
       </button>
 
-      <div
-        className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted text-caption font-medium text-foreground-secondary"
-        aria-label={displayName ? `${displayName}, ${role}` : "User avatar"}
-        title={displayName ? `${displayName} · ${role}` : "Set your name in Settings"}
+      <Link
+        href="/settings"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted text-caption font-medium text-foreground-secondary transition-colors duration-fast hover:bg-muted/80"
+        aria-label={displayName ? `${displayName}, ${role}` : email ? email : "Account settings"}
+        title={displayName ? `${displayName} · ${role}` : email || "Account settings"}
       >
-        {getInitials(displayName)}
-      </div>
+        {getInitials(displayName || email)}
+      </Link>
     </header>
   );
 }

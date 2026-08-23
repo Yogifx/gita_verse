@@ -12,7 +12,7 @@ function ago(ms: number): string {
  * Structured to match the shape a future object-storage/CDN layer would
  * return — replacing this module is the only change needed to go live.
  */
-export const seedAssets: Asset[] = [
+export const seedAssets: Omit<Asset, "ownerId">[] = [
   {
     id: "a1",
     name: "Krishna Meditation Background",

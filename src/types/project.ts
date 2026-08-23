@@ -23,6 +23,8 @@ export type KnowledgeProjectCategory =
 
 export type KnowledgeProject = {
   id: string;
+  /** Owning account — Identity & Access isolation (docs §4.2, §5.6). */
+  ownerId: string;
   name: string;
   description: string;
   category?: KnowledgeProjectCategory;

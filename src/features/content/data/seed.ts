@@ -18,7 +18,7 @@ function fromNow(ms: number): string {
  * Structured to match the shape a future content API/database would return —
  * replacing this module is the only change needed to go live.
  */
-export const seedContentItems: ContentItem[] = [
+export const seedContentItems: Omit<ContentItem, "ownerId">[] = [
   {
     id: "c1",
     title: "Duty Without Attachment",

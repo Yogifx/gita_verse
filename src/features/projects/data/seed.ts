@@ -9,10 +9,9 @@ function ago(ms: number): string {
 
 /**
  * Realistic starting Knowledge Projects so the module is immediately
- * testable. Structured to match the shape a future projects API/database
- * would return — replacing this module is the only change needed to go live.
+ * testable. Ownership is applied at persistence seed time (GV-012).
  */
-export const seedKnowledgeProjects: KnowledgeProject[] = [
+export const seedKnowledgeProjects: Omit<KnowledgeProject, "ownerId">[] = [
   {
     id: "p1",
     name: "Bhagavad Gita Core Teachings",

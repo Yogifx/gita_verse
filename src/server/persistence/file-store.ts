@@ -1,8 +1,12 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { DATA_DIR, DB_FILE_PATH } from "@/server/persistence/paths";
-import { createSeedDb } from "@/server/persistence/seed";
+import { createDemoUser, createSeedDb } from "@/server/persistence/seed";
 import { DB_SCHEMA_VERSION, type GitaVerseDb } from "@/server/persistence/types";
 import { PersistenceError } from "@/server/persistence/errors";
+import type { Asset } from "@/types/asset";
+import type { ContentItem } from "@/types/content";
+import type { KnowledgeProject } from "@/types/project";
+import type { AppSettings } from "@/types/settings";
 
 /**
  * Serializes all reads/writes through a single in-process promise chain.
@@ -21,12 +25,62 @@ function withLock<T>(task: () => Promise<T>): Promise<T> {
   return result;
 }
 
-/** Runs schema migrations in place. Currently a no-op beyond version 1. */
-function migrate(db: GitaVerseDb): GitaVerseDb {
-  if (db.version === DB_SCHEMA_VERSION) return db;
-  // Future schema changes get an explicit migration step here, keyed off
-  // db.version. For now, coerce unknown/missing versions forward safely.
-  return { ...db, version: DB_SCHEMA_VERSION };
+type LegacyV1Db = {
+  version: number;
+  projects: Array<KnowledgeProject & { ownerId?: string }>;
+  contentItems: Array<ContentItem & { ownerId?: string }>;
+  assets: Array<Asset & { ownerId?: string }>;
+  settings?: AppSettings;
+  users?: GitaVerseDb["users"];
+  sessions?: GitaVerseDb["sessions"];
+};
+
+async function migrate(raw: LegacyV1Db): Promise<{ db: GitaVerseDb; changed: boolean }> {
+  if (raw.version === DB_SCHEMA_VERSION && Array.isArray(raw.users) && Array.isArray(raw.sessions)) {
+    return {
+      db: {
+        version: DB_SCHEMA_VERSION,
+        users: raw.users,
+        sessions: raw.sessions,
+        projects: raw.projects as KnowledgeProject[],
+        contentItems: raw.contentItems as ContentItem[],
+        assets: raw.assets as Asset[],
+      },
+      changed: false,
+    };
+  }
+
+  const demoUser = await createDemoUser({
+    displayName: raw.settings?.displayName || "GitaVerse Creator",
+    role: raw.settings?.role,
+    dailyTarget: raw.settings?.dailyTarget,
+  });
+
+  return {
+    db: {
+      version: DB_SCHEMA_VERSION,
+      users: [demoUser],
+      sessions: [],
+      projects: raw.projects.map((project) => ({
+        ...project,
+        ownerId: project.ownerId ?? demoUser.id,
+      })),
+      contentItems: raw.contentItems.map((item) => ({
+        ...item,
+        ownerId: item.ownerId ?? demoUser.id,
+      })),
+      assets: raw.assets.map((asset) => ({
+        ...asset,
+        ownerId: asset.ownerId ?? demoUser.id,
+      })),
+    },
+    changed: true,
+  };
+}
+
+async function persist(db: GitaVerseDb): Promise<void> {
+  await mkdir(DATA_DIR, { recursive: true });
+  await writeFile(DB_FILE_PATH, JSON.stringify(db, null, 2), "utf-8");
 }
 
 async function ensureDbFile(): Promise<GitaVerseDb> {
@@ -34,9 +88,9 @@ async function ensureDbFile(): Promise<GitaVerseDb> {
     const raw = await readFile(DB_FILE_PATH, "utf-8");
     if (!raw.trim()) throw new Error("empty file");
 
-    let parsed: GitaVerseDb;
+    let parsed: LegacyV1Db;
     try {
-      parsed = JSON.parse(raw) as GitaVerseDb;
+      parsed = JSON.parse(raw) as LegacyV1Db;
     } catch (cause) {
       throw new PersistenceError(
         "The GitaVerse data file is corrupted and could not be parsed as JSON.",
@@ -44,14 +98,25 @@ async function ensureDbFile(): Promise<GitaVerseDb> {
       );
     }
 
-    return migrate(parsed);
+    const { db, changed } = await migrate(parsed);
+    if (changed) {
+      try {
+        await persist(db);
+      } catch (cause) {
+        throw new PersistenceError("Failed to write GitaVerse data file.", cause);
+      }
+    }
+    return db;
   } catch (error) {
     if (error instanceof PersistenceError) throw error;
 
     // File missing (fresh install) — initialize with seed data.
-    const seeded = createSeedDb();
-    await mkdir(DATA_DIR, { recursive: true });
-    await writeFile(DB_FILE_PATH, JSON.stringify(seeded, null, 2), "utf-8");
+    const seeded = await createSeedDb();
+    try {
+      await persist(seeded);
+    } catch (cause) {
+      throw new PersistenceError("Failed to write GitaVerse data file.", cause);
+    }
     return seeded;
   }
 }
@@ -65,8 +130,7 @@ export function readDb(): Promise<GitaVerseDb> {
 export function writeDb(db: GitaVerseDb): Promise<void> {
   return withLock(async () => {
     try {
-      await mkdir(DATA_DIR, { recursive: true });
-      await writeFile(DB_FILE_PATH, JSON.stringify(db, null, 2), "utf-8");
+      await persist(db);
     } catch (cause) {
       throw new PersistenceError("Failed to write GitaVerse data file.", cause);
     }
@@ -84,8 +148,7 @@ export async function mutateDb<T>(
     const current = await ensureDbFile();
     const { db, result } = mutator(current);
     try {
-      await mkdir(DATA_DIR, { recursive: true });
-      await writeFile(DB_FILE_PATH, JSON.stringify(db, null, 2), "utf-8");
+      await persist(db);
     } catch (cause) {
       throw new PersistenceError("Failed to write GitaVerse data file.", cause);
     }

@@ -21,6 +21,8 @@ export type AssetDimensions = {
 
 export type Asset = {
   id: string;
+  /** Owning account — Identity & Access isolation (docs §4.2, §5.6). */
+  ownerId: string;
   name: string;
   type: AssetFileType;
   category: AssetCategory;

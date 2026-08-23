@@ -31,3 +31,10 @@ export class PersistenceError extends Error {
     this.name = "PersistenceError";
   }
 }
+
+export class UnauthorizedError extends Error {
+  constructor(message = "You need to sign in to continue.") {
+    super(message);
+    this.name = "UnauthorizedError";
+  }
+}

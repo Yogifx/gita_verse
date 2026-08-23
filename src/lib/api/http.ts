@@ -3,6 +3,7 @@ import {
   DuplicateRecordError,
   NotFoundError,
   PersistenceError,
+  UnauthorizedError,
   ValidationError,
 } from "@/server/persistence/errors";
 
@@ -23,6 +24,9 @@ export function jsonError(error: unknown): NextResponse {
   }
   if (error instanceof DuplicateRecordError) {
     return NextResponse.json({ error: { message: error.message, code: "duplicate" } }, { status: 409 });
+  }
+  if (error instanceof UnauthorizedError) {
+    return NextResponse.json({ error: { message: error.message, code: "unauthorized" } }, { status: 401 });
   }
   if (error instanceof PersistenceError) {
     // eslint-disable-next-line no-console

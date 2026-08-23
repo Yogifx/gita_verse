@@ -3,22 +3,23 @@
 import { create } from "zustand";
 import type { CreatorRole } from "@/constants/settings";
 import { DEFAULT_CREATOR_ROLE } from "@/constants/settings";
-import { apiGet, apiPatch } from "@/lib/api/client";
+import { apiGet, apiPatch, apiPost } from "@/lib/api/client";
 import { usePersistenceStatusStore } from "@/stores/persistence-status-store";
 import type { AppSettings } from "@/types/settings";
 
 /**
- * Local workspace profile — persisted (GV-011), but still explicitly NOT
- * real authentication/identity (docs/09_PRODUCT_ARCHITECTURE.md §4.2, §13).
- * GitaVerse has one local workspace today, so this is a singleton record.
+ * Profile + workspace preferences for the signed-in account (GV-012).
+ * Canonical identity lives in persistence; this store is the client cache.
  */
 type SettingsState = {
+  email: string;
   displayName: string;
   role: CreatorRole;
   isHydrated: boolean;
   hydrate: () => Promise<void>;
   setDisplayName: (name: string) => void;
   setRole: (role: CreatorRole) => void;
+  signOut: () => Promise<void>;
 };
 
 function reportPersistenceError(action: string, error: unknown) {
@@ -33,6 +34,7 @@ function reportPersistenceError(action: string, error: unknown) {
 let displayNameSaveTimeout: ReturnType<typeof setTimeout> | undefined;
 
 export const useSettingsStore = create<SettingsState>((set, get) => ({
+  email: "",
   displayName: "",
   role: DEFAULT_CREATOR_ROLE,
   isHydrated: false,
@@ -41,16 +43,20 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     if (get().isHydrated) return;
     try {
       const settings = await apiGet<AppSettings>("/api/settings");
-      set({ displayName: settings.displayName, role: settings.role, isHydrated: true });
+      set({
+        email: settings.email,
+        displayName: settings.displayName,
+        role: settings.role,
+        isHydrated: true,
+      });
     } catch (error) {
-      reportPersistenceError("load your profile from the workspace data file", error);
+      reportPersistenceError("load your profile", error);
       set({ isHydrated: true });
     }
   },
 
   setDisplayName: (name) => {
     set({ displayName: name });
-    // Debounced so typing doesn't fire a write on every keystroke.
     if (displayNameSaveTimeout) clearTimeout(displayNameSaveTimeout);
     displayNameSaveTimeout = setTimeout(() => {
       void apiPatch("/api/settings", { displayName: name }).catch((error) =>
@@ -64,5 +70,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     void apiPatch("/api/settings", { role }).catch((error) =>
       reportPersistenceError("save role", error),
     );
+  },
+
+  signOut: async () => {
+    await apiPost("/api/auth/sign-out", {});
+    window.location.assign("/sign-in");
   },
 }));

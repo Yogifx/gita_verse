@@ -1,7 +1,7 @@
 /**
- * Role labels are descriptive only — GitaVerse has no enforced permissions
- * yet. Real roles (owner/editor/viewer) and membership are future work
- * owned by Identity & Access (docs/09_PRODUCT_ARCHITECTURE.md §4.2, §13).
+ * Workspace role labels are descriptive profile metadata. Enforced
+ * owner/editor/viewer permissions and project membership remain future
+ * Identity & Access work (docs/09_PRODUCT_ARCHITECTURE.md §4.2, §13).
  */
 export const CREATOR_ROLES = [
   "Creator",

@@ -1,17 +1,21 @@
+import type { ReactNode } from "react";
 import { redirect } from "next/navigation";
-import { AppLayout } from "@/components/layout";
 import { getCurrentUser } from "@/server/auth/session";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-export default async function ShellLayout({
+export default async function AuthLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   const user = await getCurrentUser();
-  if (!user) redirect("/sign-in");
+  if (user) redirect("/dashboard");
 
-  return <AppLayout>{children}</AppLayout>;
+  return (
+    <div className="min-h-dvh bg-background text-foreground">
+      {children}
+    </div>
+  );
 }

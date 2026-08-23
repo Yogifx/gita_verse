@@ -1,13 +1,12 @@
 /**
- * Local workspace settings — persisted (docs/09_PRODUCT_ARCHITECTURE.md §13
- * persistence stance), but explicitly NOT tied to real authentication/identity
- * yet (Identity & Access is a future milestone, §4.2). Until then GitaVerse
- * operates as a single local workspace, so this is a singleton record rather
- * than a per-user table.
+ * Session-scoped workspace preferences. Identity fields live on the
+ * authenticated user (GV-012); this DTO is what `/api/settings` returns so
+ * existing Dashboard/Settings stores keep the same shape.
  */
 import type { CreatorRole } from "@/constants/settings";
 
 export type AppSettings = {
+  email: string;
   displayName: string;
   role: CreatorRole;
   dailyTarget: number;

@@ -73,6 +73,7 @@ export const useContentStore = create<ContentState>((set, get) => ({
 
     const newItem: ContentItem = {
       id,
+      ownerId: "",
       title: "Untitled idea",
       format,
       status: "draft",

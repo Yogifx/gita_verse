@@ -8,15 +8,16 @@
 import type { Asset } from "@/types/asset";
 import type { ContentItem } from "@/types/content";
 import type { KnowledgeProject } from "@/types/project";
-import type { AppSettings } from "@/types/settings";
+import type { SessionRecord, UserRecord } from "@/types/user";
 
-export const DB_SCHEMA_VERSION = 1;
+export const DB_SCHEMA_VERSION = 2;
 
 export type GitaVerseDb = {
-  /** Schema version — bump and add a migration step in migrate.ts on breaking changes. */
+  /** Schema version — bump and add a migration step in migrate() on breaking changes. */
   version: number;
+  users: UserRecord[];
+  sessions: SessionRecord[];
   projects: KnowledgeProject[];
   contentItems: ContentItem[];
   assets: Asset[];
-  settings: AppSettings;
 };

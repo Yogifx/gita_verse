@@ -60,6 +60,7 @@ export const useProjectsStore = create<ProjectsState>((set, get) => ({
 
     const newProject: KnowledgeProject = {
       id,
+      ownerId: "",
       name: name.trim(),
       description: description.trim(),
       category,

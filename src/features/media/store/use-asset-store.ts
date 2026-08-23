@@ -81,6 +81,7 @@ export const useAssetStore = create<AssetState>((set, get) => ({
 
     const newAsset: Asset = {
       id,
+      ownerId: "",
       name: name.trim(),
       type,
       category,

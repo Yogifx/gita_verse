@@ -22,11 +22,22 @@ async function parseResponse<T>(response: Response): Promise<T> {
 
   if (!response.ok) {
     const errorBody = body as { error?: { message?: string; code?: string } } | undefined;
-    throw new ApiError(
+    const error = new ApiError(
       errorBody?.error?.message ?? `Request failed with status ${response.status}.`,
       response.status,
       errorBody?.error?.code,
     );
+
+    if (
+      typeof window !== "undefined" &&
+      response.status === 401 &&
+      !window.location.pathname.startsWith("/sign-in") &&
+      !window.location.pathname.startsWith("/sign-up")
+    ) {
+      window.location.assign("/sign-in");
+    }
+
+    throw error;
   }
 
   return (body as { data: T }).data;

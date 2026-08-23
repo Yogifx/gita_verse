@@ -35,6 +35,8 @@ export type GitaReference = {
 
 export type ContentItem = {
   id: string;
+  /** Owning account — Identity & Access isolation (docs §4.2, §5.6). */
+  ownerId: string;
   title: string;
   format: ContentFormat;
   status: ContentStatus;
