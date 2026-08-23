@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage";
+import { ThemeManagerView } from "@/features/theme/components/ThemeManagerView";
 
 export const metadata: Metadata = {
   title: "Theme Manager",
 };
 
 export default function ThemeManagerPage() {
-  return <PlaceholderPage label="Theme Manager" />;
+  return <ThemeManagerView />;
 }

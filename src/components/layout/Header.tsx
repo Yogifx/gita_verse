@@ -50,8 +50,8 @@ export function Header() {
         type="button"
         onClick={toggleTheme}
         className="rounded-control border border-border p-2 text-foreground-secondary transition-colors duration-fast hover:bg-muted hover:text-foreground"
-        aria-label="Toggle theme placeholder"
-        title="Theme switch (placeholder)"
+        aria-label="Toggle theme"
+        title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
       >
         {theme === "dark" ? (
           <Sun className="h-4 w-4 text-gold" />
