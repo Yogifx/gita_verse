@@ -18,7 +18,6 @@ export function QuickActions() {
   const createContentItem = useContentStore((s) => s.createContentItem);
 
   function handleNewProject() {
-    createContentItem("post");
     router.push("/projects");
   }
 
