@@ -15,6 +15,8 @@ type ContentState = {
   archiveContentItem: (id: string) => void;
   /** Adds or removes a target platform on an item. */
   toggleItemPlatform: (id: string, platform: Platform) => void;
+  /** Updates the daily publishing target used across Dashboard widgets. */
+  setDailyTarget: (target: number) => void;
 };
 
 let draftCounter = 0;
@@ -106,5 +108,9 @@ export const useContentStore = create<ContentState>((set, get) => ({
         };
       }),
     }));
+  },
+
+  setDailyTarget: (target) => {
+    set({ dailyTarget: Math.max(1, Math.round(target)) });
   },
 }));

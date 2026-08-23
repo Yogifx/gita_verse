@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage";
+import { SettingsView } from "@/features/settings/components/SettingsView";
 
 export const metadata: Metadata = {
   title: "Settings",
 };
 
 export default function SettingsPage() {
-  return <PlaceholderPage label="Settings" />;
+  return <SettingsView />;
 }

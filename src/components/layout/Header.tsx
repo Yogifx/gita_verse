@@ -3,13 +3,23 @@
 import { Menu, Moon, Search, Sun } from "lucide-react";
 import { APP_NAME } from "@/constants/navigation";
 import { useShellStore } from "@/stores/shell-store";
+import { useSettingsStore } from "@/features/settings/store/use-settings-store";
 import { cn } from "@/lib/utils/cn";
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "GV";
+  const initials = parts.slice(0, 2).map((part) => part[0]?.toUpperCase() ?? "");
+  return initials.join("") || "GV";
+}
 
 export function Header() {
   const setMobileNavOpen = useShellStore((s) => s.setMobileNavOpen);
   const currentProjectName = useShellStore((s) => s.currentProjectName);
   const theme = useShellStore((s) => s.theme);
   const toggleTheme = useShellStore((s) => s.toggleTheme);
+  const displayName = useSettingsStore((s) => s.displayName);
+  const role = useSettingsStore((s) => s.role);
 
   return (
     <header className="flex h-16 shrink-0 items-center gap-3 border-b border-border bg-surface px-4 md:px-6">
@@ -62,10 +72,10 @@ export function Header() {
 
       <div
         className="flex h-9 w-9 items-center justify-center rounded-full border border-border bg-muted text-caption font-medium text-foreground-secondary"
-        aria-label="User avatar placeholder"
-        title="User"
+        aria-label={displayName ? `${displayName}, ${role}` : "User avatar"}
+        title={displayName ? `${displayName} · ${role}` : "Set your name in Settings"}
       >
-        GV
+        {getInitials(displayName)}
       </div>
     </header>
   );
