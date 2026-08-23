@@ -39,3 +39,8 @@ next-env.d.ts
 
 # Vercel
 .vercel
+
+# Local persistence data (GV-011) — generated on first run from seed data,
+# not committed so each environment gets its own local workspace file.
+/data/*
+!/data/README.md

@@ -17,9 +17,11 @@ import { ChapterCoverageMap } from "@/features/design-intelligence/components/Ch
 import { PlatformCoverageList } from "@/features/design-intelligence/components/PlatformCoverageList";
 import { GuidanceFilterBar } from "@/features/design-intelligence/components/GuidanceFilterBar";
 import { GuidelineCard } from "@/features/design-intelligence/components/GuidelineCard";
+import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
 
 export function DesignIntelligenceView() {
   const items = useContentStore((s) => s.items);
+  const isHydrated = useContentStore((s) => s.isHydrated);
   const [filter, setFilter] = useState<GuidanceFilterKey>("all");
 
   const formatCoverage = useMemo(() => getFormatCoverage(items), [items]);
@@ -42,6 +44,10 @@ export function DesignIntelligenceView() {
     () => filterGuidelines(designGuidelines, filter),
     [filter],
   );
+
+  if (!isHydrated) {
+    return <WorkspaceLoading label="Loading design intelligence…" />;
+  }
 
   return (
     <div className="flex flex-col gap-5">

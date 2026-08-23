@@ -13,9 +13,11 @@ import { ContentSearchBar } from "@/features/content-studio/components/ContentSe
 import { ContentFilterBar } from "@/features/content-studio/components/ContentFilterBar";
 import { ContentCard } from "@/features/content-studio/components/ContentCard";
 import { CreateContentDialog } from "@/features/content-studio/components/CreateContentDialog";
+import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
 
 export function ContentLibraryView() {
   const items = useContentStore((s) => s.items);
+  const isHydrated = useContentStore((s) => s.isHydrated);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<ContentFilterKey>("all");
   const [createOpen, setCreateOpen] = useState(false);
@@ -54,7 +56,9 @@ export function ContentLibraryView() {
 
       <ContentFilterBar active={filter} onChange={setFilter} counts={counts} />
 
-      {visible.length === 0 ? (
+      {!isHydrated ? (
+        <WorkspaceLoading label="Loading content…" />
+      ) : visible.length === 0 ? (
         <div className="flex flex-col items-center justify-center gap-3 rounded-panel border border-dashed border-border bg-surface/60 px-6 py-16 text-center">
           <p className="text-body text-foreground-secondary">
             {items.length === 0

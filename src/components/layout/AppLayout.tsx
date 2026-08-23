@@ -7,7 +7,12 @@ import { PropertiesPanel } from "@/components/layout/PropertiesPanel";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { Workspace } from "@/components/layout/Workspace";
+import { PersistenceStatusToast } from "@/components/shared/PersistenceStatusToast";
 import { useShellStore } from "@/stores/shell-store";
+import { useContentStore } from "@/features/content/store/use-content-store";
+import { useProjectsStore } from "@/features/projects/store/use-projects-store";
+import { useAssetStore } from "@/features/media/store/use-asset-store";
+import { useSettingsStore } from "@/features/settings/store/use-settings-store";
 import { cn } from "@/lib/utils/cn";
 
 type AppLayoutProps = {
@@ -22,6 +27,16 @@ export function AppLayout({ children }: AppLayoutProps) {
   useEffect(() => {
     setTheme(theme);
   }, [setTheme, theme]);
+
+  // One-time hydration of all persisted domain stores (GV-011). Each
+  // store's `hydrate()` guards against repeat calls via `isHydrated`, so
+  // this is safe under React Strict Mode's double-invoke in development.
+  useEffect(() => {
+    void useContentStore.getState().hydrate();
+    void useProjectsStore.getState().hydrate();
+    void useAssetStore.getState().hydrate();
+    void useSettingsStore.getState().hydrate();
+  }, []);
 
   return (
     <div className="flex min-h-dvh bg-background text-foreground">
@@ -40,6 +55,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
         <StatusBar />
       </div>
+
+      <PersistenceStatusToast />
     </div>
   );
 }

@@ -19,6 +19,7 @@ function isContentFormat(value: string | undefined): value is ContentFormat {
 
 export function StudioView({ format, itemId }: StudioViewProps) {
   const items = useContentStore((s) => s.items);
+  const isHydrated = useContentStore((s) => s.isHydrated);
 
   const activeItem = itemId ? items.find((item) => item.id === itemId) : undefined;
   const activeFormat = isContentFormat(format)
@@ -26,6 +27,14 @@ export function StudioView({ format, itemId }: StudioViewProps) {
     : activeItem
       ? activeItem.format
       : undefined;
+
+  if (!isHydrated) {
+    return (
+      <SectionCard title="Content Studio" description="Loading workspace…">
+        <p className="py-6 text-center text-caption text-foreground-muted">Loading…</p>
+      </SectionCard>
+    );
+  }
 
   if (activeItem) {
     const meta = CONTENT_FORMAT_META[activeItem.format];

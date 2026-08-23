@@ -14,9 +14,11 @@ import { AssetFilters } from "@/features/media/components/AssetFilters";
 import { AssetGrid } from "@/features/media/components/AssetGrid";
 import { UploadAssetModal } from "@/features/media/components/UploadAssetModal";
 import { AssetPreviewModal } from "@/features/media/components/AssetPreviewModal";
+import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
 
 export function AssetLibrary() {
   const assets = useAssetStore((s) => s.assets);
+  const isHydrated = useAssetStore((s) => s.isHydrated);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<AssetFilterKey>("all");
   const [uploadOpen, setUploadOpen] = useState(false);
@@ -53,12 +55,16 @@ export function AssetLibrary() {
 
       <AssetFilters active={filter} onChange={setFilter} counts={counts} />
 
-      <AssetGrid
-        assets={visible}
-        hasAnyAssets={assets.length > 0}
-        onSelect={setPreviewId}
-        onUpload={() => setUploadOpen(true)}
-      />
+      {isHydrated ? (
+        <AssetGrid
+          assets={visible}
+          hasAnyAssets={assets.length > 0}
+          onSelect={setPreviewId}
+          onUpload={() => setUploadOpen(true)}
+        />
+      ) : (
+        <WorkspaceLoading label="Loading assets…" />
+      )}
 
       <UploadAssetModal open={uploadOpen} onClose={() => setUploadOpen(false)} />
       <AssetPreviewModal assetId={previewId} onClose={() => setPreviewId(null)} />

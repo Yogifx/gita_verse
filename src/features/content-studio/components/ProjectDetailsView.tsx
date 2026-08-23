@@ -12,6 +12,7 @@ import { DailyBucketBadge } from "@/features/content-studio/components/DailyBuck
 import { WorkflowTracker } from "@/features/content-studio/components/WorkflowTracker";
 import { PlatformTargetPicker } from "@/features/content-studio/components/PlatformTargetPicker";
 import { formatDate, formatRelativeTime } from "@/lib/utils/time";
+import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
 
 type ProjectDetailsViewProps = {
   id: string;
@@ -20,11 +21,16 @@ type ProjectDetailsViewProps = {
 export function ProjectDetailsView({ id }: ProjectDetailsViewProps) {
   const router = useRouter();
   const items = useContentStore((s) => s.items);
+  const isHydrated = useContentStore((s) => s.isHydrated);
   const duplicateContentItem = useContentStore((s) => s.duplicateContentItem);
   const archiveContentItem = useContentStore((s) => s.archiveContentItem);
   const toggleItemPlatform = useContentStore((s) => s.toggleItemPlatform);
 
   const item = items.find((entry) => entry.id === id);
+
+  if (!isHydrated) {
+    return <WorkspaceLoading label="Loading content…" />;
+  }
 
   if (!item) {
     return (

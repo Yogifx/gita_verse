@@ -104,7 +104,7 @@ export function UploadAssetModal({ open, onClose }: UploadAssetModalProps) {
       open={open}
       onClose={handleClose}
       title="Upload Asset"
-      description="Add a reusable creative asset to your library. This milestone stores assets locally in this session — no file leaves your browser."
+      description="Add a reusable creative asset to your library. Metadata is saved to the local workspace; an attached file preview stays in this browser session only."
     >
       <div className="flex flex-col gap-5">
         <div>
@@ -144,7 +144,7 @@ export function UploadAssetModal({ open, onClose }: UploadAssetModalProps) {
               <span className="block text-small text-foreground-muted">
                 {selectedFile
                   ? formatFileSize(selectedFile.size)
-                  : "PNG, JPG, SVG, or WEBP — stored for this session only"}
+                  : "PNG, JPG, SVG, or WEBP — preview stays in this session"}
               </span>
             </span>
           </button>

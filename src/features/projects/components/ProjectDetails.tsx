@@ -9,6 +9,7 @@ import { PROJECT_CATEGORY_META } from "@/constants/projects";
 import { ProjectStatusBadge } from "@/features/projects/components/ProjectStatusBadge";
 import { SectionCard } from "@/components/shared/SectionCard";
 import { formatDate, formatRelativeTime } from "@/lib/utils/time";
+import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
 
 type ProjectDetailsProps = {
   id: string;
@@ -17,9 +18,14 @@ type ProjectDetailsProps = {
 export function ProjectDetails({ id }: ProjectDetailsProps) {
   const router = useRouter();
   const projects = useProjectsStore((s) => s.projects);
+  const isHydrated = useProjectsStore((s) => s.isHydrated);
   const archiveProject = useProjectsStore((s) => s.archiveProject);
 
   const project = getProjectById(projects, id);
+
+  if (!isHydrated) {
+    return <WorkspaceLoading label="Loading project…" />;
+  }
 
   if (!project) {
     return (

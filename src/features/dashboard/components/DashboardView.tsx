@@ -11,15 +11,21 @@ import { ContentFormatGrid } from "@/features/dashboard/components/ContentFormat
 import { QuickActions } from "@/features/dashboard/components/QuickActions";
 import { RecentProjects } from "@/features/dashboard/components/RecentProjects";
 import { PublishingOverview } from "@/features/dashboard/components/PublishingOverview";
+import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
 
 export function DashboardView() {
   const items = useContentStore((s) => s.items);
   const dailyTarget = useContentStore((s) => s.dailyTarget);
+  const isHydrated = useContentStore((s) => s.isHydrated);
 
   const snapshot = useMemo(
     () => buildDashboardSnapshot(items, dailyTarget),
     [items, dailyTarget],
   );
+
+  if (!isHydrated) {
+    return <WorkspaceLoading label="Loading dashboard…" />;
+  }
 
   return (
     <div className="flex flex-col gap-4 md:gap-6">

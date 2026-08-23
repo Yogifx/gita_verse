@@ -13,7 +13,7 @@ export function ProfileSettingsCard() {
   return (
     <SectionCard
       title="Profile"
-      description="How you're identified across the GitaVerse workspace. This stays on this device — no account system yet."
+      description="How you're identified across the GitaVerse workspace. Saved to the local workspace data file — no account system yet."
     >
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="flex flex-col gap-1.5">

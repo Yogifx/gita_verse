@@ -7,9 +7,11 @@ import { searchProjects } from "@/features/projects/lib/selectors";
 import { ProjectSearch } from "@/features/projects/components/ProjectSearch";
 import { ProjectList } from "@/features/projects/components/ProjectList";
 import { CreateProjectModal } from "@/features/projects/components/CreateProjectModal";
+import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
 
 export function ProjectsListView() {
   const projects = useProjectsStore((s) => s.projects);
+  const isHydrated = useProjectsStore((s) => s.isHydrated);
   const [query, setQuery] = useState("");
   const [createOpen, setCreateOpen] = useState(false);
 
@@ -29,11 +31,15 @@ export function ProjectsListView() {
         </button>
       </div>
 
-      <ProjectList
-        projects={visibleProjects}
-        hasAnyProjects={projects.length > 0}
-        onCreate={() => setCreateOpen(true)}
-      />
+      {isHydrated ? (
+        <ProjectList
+          projects={visibleProjects}
+          hasAnyProjects={projects.length > 0}
+          onCreate={() => setCreateOpen(true)}
+        />
+      ) : (
+        <WorkspaceLoading label="Loading Knowledge Projects…" />
+      )}
 
       <CreateProjectModal open={createOpen} onClose={() => setCreateOpen(false)} />
     </div>

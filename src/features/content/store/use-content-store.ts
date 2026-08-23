@@ -2,11 +2,17 @@
 
 import { create } from "zustand";
 import type { ContentFormat, ContentItem, Platform } from "@/types/content";
-import { DAILY_TARGET, seedContentItems } from "@/features/content/data/seed";
+import type { AppSettings } from "@/types/settings";
+import { apiGet, apiPatch, apiPost } from "@/lib/api/client";
+import { usePersistenceStatusStore } from "@/stores/persistence-status-store";
 
 type ContentState = {
   items: ContentItem[];
   dailyTarget: number;
+  /** True once initial data has been loaded from the persistence API. */
+  isHydrated: boolean;
+  /** Loads persisted content items + daily target. Safe to call multiple times. */
+  hydrate: () => Promise<void>;
   /** Creates a new draft content item and returns its id. */
   createContentItem: (format?: ContentFormat, platforms?: Platform[]) => string;
   /** Clones an existing item as a fresh draft and returns the new id. */
@@ -26,9 +32,40 @@ function nextDraftId(): string {
   return `draft-${Date.now()}-${draftCounter}`;
 }
 
+/**
+ * All writes below apply an optimistic local update first (unchanged
+ * behavior from pre-GV-011), then persist through `/api/*` in the
+ * background. Failures are logged and surfaced via the shared
+ * persistence-status store rather than silently dropped — the local UI
+ * keeps working, but the change did not survive a refresh/restart.
+ */
+function reportPersistenceError(action: string, error: unknown) {
+  const detail = error instanceof Error ? error.message : String(error);
+  // eslint-disable-next-line no-console
+  console.error(`[GitaVerse] content store failed to ${action}:`, error);
+  usePersistenceStatusStore
+    .getState()
+    .reportError(`Couldn't save "${action}" — ${detail}. Your change may not survive a refresh.`);
+}
+
 export const useContentStore = create<ContentState>((set, get) => ({
-  items: seedContentItems,
-  dailyTarget: DAILY_TARGET,
+  items: [],
+  dailyTarget: 1,
+  isHydrated: false,
+
+  hydrate: async () => {
+    if (get().isHydrated) return;
+    try {
+      const [items, settings] = await Promise.all([
+        apiGet<ContentItem[]>("/api/content"),
+        apiGet<AppSettings>("/api/settings"),
+      ]);
+      set({ items, dailyTarget: settings.dailyTarget, isHydrated: true });
+    } catch (error) {
+      reportPersistenceError("load content from the workspace data file", error);
+      set({ isHydrated: true });
+    }
+  },
 
   createContentItem: (format = "post", platforms = []) => {
     const id = nextDraftId();
@@ -55,6 +92,9 @@ export const useContentStore = create<ContentState>((set, get) => ({
     };
 
     set((state) => ({ items: [newItem, ...state.items] }));
+    void apiPost("/api/content", newItem).catch((error) =>
+      reportPersistenceError("create content item", error),
+    );
     return id;
   },
 
@@ -81,6 +121,9 @@ export const useContentStore = create<ContentState>((set, get) => ({
     };
 
     set((state) => ({ items: [copy, ...state.items] }));
+    void apiPost("/api/content", copy).catch((error) =>
+      reportPersistenceError("duplicate content item", error),
+    );
     return newId;
   },
 
@@ -91,26 +134,37 @@ export const useContentStore = create<ContentState>((set, get) => ({
         item.id === id ? { ...item, archived: true, updatedAt: now } : item,
       ),
     }));
+    void apiPatch(`/api/content/${id}`, { archived: true, updatedAt: now }).catch((error) =>
+      reportPersistenceError("archive content item", error),
+    );
   },
 
   toggleItemPlatform: (id, platform) => {
     const now = new Date().toISOString();
+    let nextPlatforms: Platform[] | undefined;
+
     set((state) => ({
       items: state.items.map((item) => {
         if (item.id !== id) return item;
         const has = item.platforms.includes(platform);
-        return {
-          ...item,
-          platforms: has
-            ? item.platforms.filter((p) => p !== platform)
-            : [...item.platforms, platform],
-          updatedAt: now,
-        };
+        nextPlatforms = has
+          ? item.platforms.filter((p) => p !== platform)
+          : [...item.platforms, platform];
+        return { ...item, platforms: nextPlatforms, updatedAt: now };
       }),
     }));
+
+    if (!nextPlatforms) return;
+    void apiPatch(`/api/content/${id}`, { platforms: nextPlatforms, updatedAt: now }).catch(
+      (error) => reportPersistenceError("update target platforms", error),
+    );
   },
 
   setDailyTarget: (target) => {
-    set({ dailyTarget: Math.max(1, Math.round(target)) });
+    const clamped = Math.max(1, Math.round(target));
+    set({ dailyTarget: clamped });
+    void apiPatch("/api/settings", { dailyTarget: clamped }).catch((error) =>
+      reportPersistenceError("update daily target", error),
+    );
   },
 }));
