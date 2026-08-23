@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage";
+import { StudioView } from "@/features/workspace/components/StudioView";
 
 export const metadata: Metadata = {
   title: "Content Studio",
 };
 
-export default function StudioPage() {
-  return <PlaceholderPage label="Content Studio" />;
+type StudioPageProps = {
+  searchParams: Promise<{ format?: string; item?: string; project?: string }>;
+};
+
+export default async function StudioPage({ searchParams }: StudioPageProps) {
+  const params = await searchParams;
+  return <StudioView format={params.format} itemId={params.item ?? params.project} />;
 }

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage";
+import { ProjectsListView } from "@/features/projects/components/ProjectsListView";
 
 export const metadata: Metadata = {
   title: "Knowledge Projects",
 };
 
 export default function ProjectsPage() {
-  return <PlaceholderPage label="Knowledge Projects" />;
+  return <ProjectsListView />;
 }

@@ -38,9 +38,9 @@ export const APP_NAV: AppRoute[] = [
   {
     id: "studio",
     label: "Content Studio",
-    href: "/studio",
+    href: "/content",
     title: "Content Studio",
-    description: "Author lessons, scripts, and structured teaching materials.",
+    description: "Create, review, and manage your GitaVerse content pieces.",
     icon: PenLine,
   },
   {
