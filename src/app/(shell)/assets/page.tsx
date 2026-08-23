@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { PlaceholderPage } from "@/components/shared/PlaceholderPage";
+import { AssetLibrary } from "@/features/media/components/AssetLibrary";
 
 export const metadata: Metadata = {
   title: "Asset Library",
 };
 
 export default function AssetsPage() {
-  return <PlaceholderPage label="Asset Library" />;
+  return <AssetLibrary />;
 }
