@@ -78,6 +78,16 @@ export const APP_NAV: AppRoute[] = [
 ];
 
 export function getRouteByPathname(pathname: string): AppRoute | undefined {
+  if (pathname === "/studio/brief" || pathname.startsWith("/studio/brief")) {
+    const studio = APP_NAV.find((route) => route.id === "studio");
+    if (studio) {
+      return {
+        ...studio,
+        title: "Content Brief",
+        description: "Capture intent for one piece of content from a verified verse.",
+      };
+    }
+  }
   if (pathname === "/studio" || pathname.startsWith("/studio/")) {
     const studio = APP_NAV.find((route) => route.id === "studio");
     if (studio) {

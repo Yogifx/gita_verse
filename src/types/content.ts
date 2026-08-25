@@ -43,6 +43,12 @@ export type ContentItem = {
   id: string;
   /** Owning account — Identity & Access isolation (docs §4.2, §5.6). */
   ownerId: string;
+  /**
+   * Optional Content Brief this piece was generated from (GV-015.2).
+   * Absent on GV-013 manual/seed items. Provenance is
+   * ContentItem → ContentBrief → projectId + verseId → GV-014.
+   */
+  briefId?: string;
   title: string;
   format: ContentFormat;
   status: ContentStatus;

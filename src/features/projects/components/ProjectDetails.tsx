@@ -117,6 +117,14 @@ export function ProjectDetails({ id }: ProjectDetailsProps) {
             knowledge/content item{project.contentCount === 1 ? "" : "s"}. Linking individual
             Content Studio pieces to a Knowledge Project arrives in a future milestone.
           </p>
+          {project.status !== "archived" ? (
+            <Link
+              href={`/studio/brief?new=1&project=${project.id}`}
+              className="inline-flex items-center gap-2 rounded-control bg-primary px-4 py-2 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
+            >
+              New Content Brief
+            </Link>
+          ) : null}
         </div>
       </SectionCard>
     </div>

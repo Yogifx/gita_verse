@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Archive, Copy, Eye, Pencil } from "lucide-react";
 import { useContentStore } from "@/features/content/store/use-content-store";
+import { useBriefStore } from "@/features/briefs/store/use-brief-store";
+import { useProjectsStore } from "@/features/projects/store/use-projects-store";
+import { getProjectById } from "@/features/projects/lib/selectors";
+import { formatVerseLabel, parseVerseAddress } from "@/features/knowledge/lib/reference";
 import { getDailyBucket, getReviewStatusLabel } from "@/features/content/lib/selectors";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { FormatBadge } from "@/components/shared/FormatBadge";
@@ -25,8 +29,16 @@ export function ProjectDetailsView({ id }: ProjectDetailsViewProps) {
   const duplicateContentItem = useContentStore((s) => s.duplicateContentItem);
   const archiveContentItem = useContentStore((s) => s.archiveContentItem);
   const toggleItemPlatform = useContentStore((s) => s.toggleItemPlatform);
+  const briefs = useBriefStore((s) => s.briefs);
+  const projects = useProjectsStore((s) => s.projects);
 
   const item = items.find((entry) => entry.id === id);
+  const brief = item?.briefId ? briefs.find((entry) => entry.id === item.briefId) : undefined;
+  const briefProject = brief ? getProjectById(projects, brief.projectId) : undefined;
+  const briefVerse = brief ? parseVerseAddress(brief.verseId) : null;
+  const briefSource = briefVerse
+    ? formatVerseLabel(briefVerse.chapter, briefVerse.verse)
+    : brief?.verseId;
 
   if (!isHydrated) {
     return <WorkspaceLoading label="Loading content…" />;
@@ -93,6 +105,22 @@ export function ProjectDetailsView({ id }: ProjectDetailsViewProps) {
             <Meta label="Created" value={formatDate(item.createdAt)} />
             <Meta label="Last modified" value={formatRelativeTime(item.updatedAt)} />
           </div>
+
+          {item.briefId ? (
+            <div className="rounded-control border border-primary-muted bg-primary-muted/30 px-4 py-3">
+              <p className="text-caption font-medium text-gold">Generated from Content Brief</p>
+              <p className="mt-1 text-caption text-foreground-secondary">
+                {briefProject?.name ?? "Knowledge Project"}
+                {briefSource ? ` · ${briefSource}` : ""}
+              </p>
+              <Link
+                href={`/studio/brief?id=${item.briefId}`}
+                className="mt-2 inline-flex text-caption font-medium text-gold hover:underline"
+              >
+                Open brief
+              </Link>
+            </div>
+          ) : null}
 
           <div>
             <p className="mb-1 text-caption font-medium text-foreground-secondary">

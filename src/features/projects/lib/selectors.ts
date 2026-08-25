@@ -9,6 +9,10 @@ export function searchProjects(projects: KnowledgeProject[], query: string): Kno
   );
 }
 
+export function getActiveProjects(projects: KnowledgeProject[]): KnowledgeProject[] {
+  return projects.filter((project) => project.status !== "archived");
+}
+
 export function getProjectById(
   projects: KnowledgeProject[],
   id: string,

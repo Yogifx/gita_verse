@@ -19,6 +19,8 @@ type ContentState = {
   hydrate: () => Promise<void>;
   /** Creates a new draft content item and returns its id. */
   createContentItem: (format?: ContentFormat, platforms?: Platform[]) => Promise<string>;
+  /** Creates a ContentItem from a saved Content Brief (GV-015.2). */
+  generateFromBrief: (briefId: string) => Promise<ContentItem>;
   /** Clones an existing item as a fresh draft and returns the new id. */
   duplicateContentItem: (id: string) => Promise<string | undefined>;
   /** Persists field updates for an existing content item. */
@@ -112,6 +114,17 @@ export const useContentStore = create<ContentState>((set, get) => ({
       reportPersistenceError("create content item", error);
     }
     return id;
+  },
+
+  generateFromBrief: async (briefId) => {
+    try {
+      const created = await apiPost<ContentItem>("/api/content/generate", { briefId });
+      set((state) => ({ items: [created, ...state.items.filter((item) => item.id !== created.id)] }));
+      return created;
+    } catch (error) {
+      reportPersistenceError("generate content from brief", error);
+      throw error;
+    }
   },
 
   duplicateContentItem: async (id) => {

@@ -13,6 +13,7 @@ import { useContentStore } from "@/features/content/store/use-content-store";
 import { useProjectsStore } from "@/features/projects/store/use-projects-store";
 import { useAssetStore } from "@/features/media/store/use-asset-store";
 import { useSettingsStore } from "@/features/settings/store/use-settings-store";
+import { useBriefStore } from "@/features/briefs/store/use-brief-store";
 import { cn } from "@/lib/utils/cn";
 
 type AppLayoutProps = {
@@ -36,6 +37,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     void useProjectsStore.getState().hydrate();
     void useAssetStore.getState().hydrate();
     void useSettingsStore.getState().hydrate();
+    void useBriefStore.getState().hydrate();
   }, []);
 
   return (

@@ -52,6 +52,13 @@ export function FormatStartView({ format }: FormatStartViewProps) {
           Choose a format to open the authoring editor. Post, carousel, reel, and session share the
           same Tiptap foundation — format-specific structure can extend this later.
         </p>
+        <p className="mt-2 text-caption text-foreground-secondary">
+          Prefer starting from a verified verse?{" "}
+          <Link href="/studio/brief" className="font-medium text-gold hover:underline">
+            Open a Content Brief
+          </Link>
+          .
+        </p>
 
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {CONTENT_FORMATS.map((option) => {

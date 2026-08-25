@@ -2,7 +2,7 @@
 
 GitaVerse persists application/domain data to `gitaverse-db.json` in this folder.
 
-The file is created automatically on first run from the existing seed data (Knowledge Projects, Content items, Assets) plus a local demo account. It is gitignored so every environment gets its own local workspace.
+The file is created automatically on first run from the existing seed data (Knowledge Projects, Content items, Assets) plus a local demo account. Content Briefs (GV-015.1) persist in the same file, belong to a Knowledge Project (`projectId`), and reference Knowledge Layer verse ids rather than copying shloka text. The file is gitignored so every environment gets its own local workspace.
 
 ## Identity (GV-012)
 

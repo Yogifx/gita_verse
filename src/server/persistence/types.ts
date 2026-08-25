@@ -6,11 +6,12 @@
  * open modals, search text) is intentionally NOT represented here.
  */
 import type { Asset } from "@/types/asset";
+import type { ContentBrief } from "@/types/brief";
 import type { ContentItem } from "@/types/content";
 import type { KnowledgeProject } from "@/types/project";
 import type { SessionRecord, UserRecord } from "@/types/user";
 
-export const DB_SCHEMA_VERSION = 2;
+export const DB_SCHEMA_VERSION = 5;
 
 export type GitaVerseDb = {
   /** Schema version — bump and add a migration step in migrate() on breaking changes. */
@@ -19,5 +20,6 @@ export type GitaVerseDb = {
   sessions: SessionRecord[];
   projects: KnowledgeProject[];
   contentItems: ContentItem[];
+  contentBriefs: ContentBrief[];
   assets: Asset[];
 };

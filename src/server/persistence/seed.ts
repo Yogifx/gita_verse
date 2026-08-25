@@ -54,6 +54,7 @@ export async function createSeedDb(): Promise<GitaVerseDb> {
       ...item,
       ownerId: demoUser.id,
     })),
+    contentBriefs: [],
     assets: seedAssets.map((asset) => ({
       ...asset,
       ownerId: demoUser.id,

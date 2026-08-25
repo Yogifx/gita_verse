@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Plus } from "lucide-react";
 import { useContentStore } from "@/features/content/store/use-content-store";
 import {
@@ -44,14 +45,22 @@ export function ContentLibraryView() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <ContentSearchBar value={query} onChange={setQuery} className="sm:max-w-md" />
-        <button
-          type="button"
-          onClick={() => setCreateOpen(true)}
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-control bg-primary px-4 py-2.5 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
-        >
-          <Plus className="h-4 w-4" />
-          Create Content
-        </button>
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+          <Link
+            href="/studio/brief"
+            className="inline-flex items-center justify-center gap-2 rounded-control border border-border px-4 py-2.5 text-caption font-medium text-foreground-secondary transition-colors duration-fast hover:bg-muted hover:text-foreground"
+          >
+            Content Brief
+          </Link>
+          <button
+            type="button"
+            onClick={() => setCreateOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-control bg-primary px-4 py-2.5 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
+          >
+            <Plus className="h-4 w-4" />
+            Create Content
+          </button>
+        </div>
       </div>
 
       <ContentFilterBar active={filter} onChange={setFilter} counts={counts} />

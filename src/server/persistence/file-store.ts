@@ -4,6 +4,7 @@ import { createDemoUser, createSeedDb } from "@/server/persistence/seed";
 import { DB_SCHEMA_VERSION, type GitaVerseDb } from "@/server/persistence/types";
 import { PersistenceError } from "@/server/persistence/errors";
 import type { Asset } from "@/types/asset";
+import type { ContentBrief } from "@/types/brief";
 import type { ContentItem } from "@/types/content";
 import type { KnowledgeProject } from "@/types/project";
 import type { AppSettings } from "@/types/settings";
@@ -25,28 +26,67 @@ function withLock<T>(task: () => Promise<T>): Promise<T> {
   return result;
 }
 
-type LegacyV1Db = {
+type LegacyDb = {
   version: number;
   projects: Array<KnowledgeProject & { ownerId?: string }>;
   contentItems: Array<ContentItem & { ownerId?: string }>;
+  contentBriefs?: Array<Partial<ContentBrief> & { id?: string; ownerId?: string }>;
   assets: Array<Asset & { ownerId?: string }>;
   settings?: AppSettings;
   users?: GitaVerseDb["users"];
   sessions?: GitaVerseDb["sessions"];
 };
 
-async function migrate(raw: LegacyV1Db): Promise<{ db: GitaVerseDb; changed: boolean }> {
-  if (raw.version === DB_SCHEMA_VERSION && Array.isArray(raw.users) && Array.isArray(raw.sessions)) {
+function briefsWithProject(raw: LegacyDb["contentBriefs"]): ContentBrief[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((entry): entry is ContentBrief =>
+    Boolean(entry && entry.id && entry.ownerId && entry.projectId && entry.verseId),
+  );
+}
+
+function currentShape(raw: LegacyDb, briefs: ContentBrief[]): GitaVerseDb {
+  return {
+    version: DB_SCHEMA_VERSION,
+    users: raw.users ?? [],
+    sessions: raw.sessions ?? [],
+    projects: raw.projects as KnowledgeProject[],
+    contentItems: raw.contentItems as ContentItem[],
+    contentBriefs: briefs,
+    assets: raw.assets as Asset[],
+  };
+}
+
+async function migrate(raw: LegacyDb): Promise<{ db: GitaVerseDb; changed: boolean }> {
+  const hasBriefs = Array.isArray(raw.contentBriefs);
+
+  if (raw.version === DB_SCHEMA_VERSION && raw.users && raw.sessions && hasBriefs) {
     return {
-      db: {
-        version: DB_SCHEMA_VERSION,
-        users: raw.users,
-        sessions: raw.sessions,
-        projects: raw.projects as KnowledgeProject[],
-        contentItems: raw.contentItems as ContentItem[],
-        assets: raw.assets as Asset[],
-      },
+      db: currentShape(raw, briefsWithProject(raw.contentBriefs)),
       changed: false,
+    };
+  }
+
+  // v4: briefs have projectId; ContentItem.briefId is optional and absent on existing rows.
+  if (raw.version === 4 && raw.users && raw.sessions && hasBriefs) {
+    return {
+      db: currentShape(raw, briefsWithProject(raw.contentBriefs)),
+      changed: true,
+    };
+  }
+
+  // v3: briefs table exists but projectId was not required.
+  if (raw.version === 3 && raw.users && raw.sessions) {
+    return {
+      db: currentShape(raw, briefsWithProject(raw.contentBriefs)),
+      changed: true,
+    };
+  }
+
+  // GV-012 v2 databases already have users/sessions. Add an empty brief table.
+  if (raw.version === 2 && raw.users && raw.sessions) {
+    return {
+      db: currentShape(raw, []),
+      changed: true,
     };
   }
 
@@ -69,6 +109,7 @@ async function migrate(raw: LegacyV1Db): Promise<{ db: GitaVerseDb; changed: boo
         ...item,
         ownerId: item.ownerId ?? demoUser.id,
       })),
+      contentBriefs: briefsWithProject(raw.contentBriefs),
       assets: raw.assets.map((asset) => ({
         ...asset,
         ownerId: asset.ownerId ?? demoUser.id,
@@ -88,9 +129,9 @@ async function ensureDbFile(): Promise<GitaVerseDb> {
     const raw = await readFile(DB_FILE_PATH, "utf-8");
     if (!raw.trim()) throw new Error("empty file");
 
-    let parsed: LegacyV1Db;
+    let parsed: LegacyDb;
     try {
-      parsed = JSON.parse(raw) as LegacyV1Db;
+      parsed = JSON.parse(raw) as LegacyDb;
     } catch (cause) {
       throw new PersistenceError(
         "The GitaVerse data file is corrupted and could not be parsed as JSON.",

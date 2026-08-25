@@ -214,6 +214,19 @@ export function CreativeWorkspace({ item }: CreativeWorkspaceProps) {
             <span className="text-caption text-foreground-muted">{meta.description}</span>
           </div>
 
+          {item.briefId ? (
+            <p className="text-caption text-foreground-secondary">
+              Generated from a{" "}
+              <Link
+                href={`/studio/brief?id=${item.briefId}`}
+                className="font-medium text-gold hover:underline"
+              >
+                Content Brief
+              </Link>
+              . Verified verse stays in the Knowledge Layer.
+            </p>
+          ) : null}
+
           <label className="flex flex-col gap-1.5">
             <span className="text-caption font-medium text-foreground-secondary">Title</span>
             <input
