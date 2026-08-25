@@ -1,12 +1,13 @@
 /**
- * GV-015.2 generate action: Content Brief → one ContentItem.
+ * GV-015.2 / GV-015.3 generate action: Content Brief → one ContentItem
+ * with structured `output` and a one-way HTML `body` projection.
  * No job table, no provider, no prompt store. Sanskrit stays in GV-014.
  */
 
 import { randomUUID } from "node:crypto";
 import {
   contentFormatFromBrief,
-  draftBodyFromGenerationInput,
+  draftFromGenerationInput,
   titleFromGenerationInput,
   unsupportedBriefFormatMessage,
   type GenerationInput,
@@ -41,6 +42,7 @@ export async function generateContentItemFromBrief(
 
   const citation = await getVerseCitationByAddress(brief.verseId);
   const input: GenerationInput = { brief, citation, format };
+  const { output, body } = draftFromGenerationInput(input);
   const now = new Date().toISOString();
 
   return createContentItem({
@@ -62,7 +64,8 @@ export async function generateContentItemFromBrief(
     transliteration: "",
     meaning: brief.meaning,
     keyLearning: brief.keyTeaching,
-    body: draftBodyFromGenerationInput(input),
+    output,
+    body,
     platforms: [],
     createdAt: now,
     updatedAt: now,

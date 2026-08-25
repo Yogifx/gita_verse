@@ -66,6 +66,14 @@ async function migrate(raw: LegacyDb): Promise<{ db: GitaVerseDb; changed: boole
     };
   }
 
+  // v5: optional ContentItem.output — existing rows omit it; body HTML is unchanged.
+  if (raw.version === 5 && raw.users && raw.sessions && hasBriefs) {
+    return {
+      db: currentShape(raw, briefsWithProject(raw.contentBriefs)),
+      changed: true,
+    };
+  }
+
   // v4: briefs have projectId; ContentItem.briefId is optional and absent on existing rows.
   if (raw.version === 4 && raw.users && raw.sessions && hasBriefs) {
     return {

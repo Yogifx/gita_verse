@@ -1,4 +1,5 @@
 import type { ContentItem, Platform } from "@/types/content";
+import { assertContentOutput } from "@/features/content/lib/content-output";
 import { readDb, mutateDb } from "@/server/persistence/file-store";
 import { DuplicateRecordError, NotFoundError, ValidationError } from "@/server/persistence/errors";
 import { getContentBrief } from "@/server/repositories/briefs.repository";
@@ -43,6 +44,7 @@ export async function createContentItem(input: ContentItem): Promise<ContentItem
     const record: ContentItem = { ...input, title: input.title.trim() };
     if (briefId) record.briefId = briefId;
     else delete record.briefId;
+    applyOutput(record, input.output, "output" in input);
 
     return { db: { ...db, contentItems: [record, ...db.contentItems] }, result: record };
   });
@@ -70,11 +72,37 @@ export async function updateContentItem(
       if (nextBriefId) updated.briefId = nextBriefId;
       else delete updated.briefId;
     }
+    applyOutput(updated, patch.output, "output" in patch);
 
     const contentItems = [...db.contentItems];
     contentItems[index] = updated;
     return { db: { ...db, contentItems }, result: updated };
   });
+}
+
+/**
+ * `output` is optional and one-way. If the patch omits it, keep the stored
+ * value (workspace HTML saves must not clear generated structure). If present,
+ * it must match `format`. Session items cannot carry an output contract.
+ */
+function applyOutput(
+  record: ContentItem,
+  value: ContentItem["output"] | undefined,
+  present: boolean,
+): void {
+  if (!present) {
+    if (record.output !== undefined) {
+      record.output = assertContentOutput(record.output, record.format);
+    }
+    return;
+  }
+
+  if (value === undefined) {
+    delete record.output;
+    return;
+  }
+
+  record.output = assertContentOutput(value, record.format);
 }
 
 export async function archiveContentItem(id: string, ownerId: string): Promise<ContentItem> {

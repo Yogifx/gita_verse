@@ -11,7 +11,7 @@ import type { ContentItem } from "@/types/content";
 import type { KnowledgeProject } from "@/types/project";
 import type { SessionRecord, UserRecord } from "@/types/user";
 
-export const DB_SCHEMA_VERSION = 5;
+export const DB_SCHEMA_VERSION = 6;
 
 export type GitaVerseDb = {
   /** Schema version — bump and add a migration step in migrate() on breaking changes. */

@@ -5,6 +5,8 @@
  * shape without UI changes.
  */
 
+import type { ContentOutput } from "@/types/content-output";
+
 /**
  * `session` is a longer-form teaching document (a class/workshop session)
  * rather than a social piece — it uses the same Creative Workspace editor and
@@ -39,6 +41,16 @@ export type GitaReference = {
   chapterTitle: string;
 };
 
+export type {
+  CarouselOutput,
+  CarouselSlide,
+  CarouselSlideRole,
+  ContentOutput,
+  PostOutput,
+  ReelOutput,
+  ReelScene,
+} from "@/types/content-output";
+
 export type ContentItem = {
   id: string;
   /** Owning account — Identity & Access isolation (docs §4.2, §5.6). */
@@ -61,8 +73,14 @@ export type ContentItem = {
   /**
    * Authored teaching document as HTML from the Creative Workspace editor
    * (Tiptap). Optional so GV-011 seed records remain valid until first save.
+   * Not replaced by `output`; generation may project HTML here one-way.
    */
   body?: string;
+  /**
+   * Structured generated content (GV-015.3). Canonical for Reel / Carousel /
+   * Post generation. Absent on legacy/manual items. Not a knowledge record.
+   */
+  output?: ContentOutput;
   platforms: Platform[];
   createdAt: string;
   updatedAt: string;
