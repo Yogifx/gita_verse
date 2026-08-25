@@ -21,8 +21,8 @@ export function QuickActions() {
     router.push("/projects");
   }
 
-  function handleCreateContent() {
-    const id = createContentItem("post");
+  async function handleCreateContent() {
+    const id = await createContentItem("post");
     router.push(`/studio?item=${id}`);
   }
 
@@ -37,7 +37,7 @@ export function QuickActions() {
         <QuickActionButton
           label="Create Content"
           icon={Sparkles}
-          onClick={handleCreateContent}
+          onClick={() => void handleCreateContent()}
         />
         <QuickActionButton
           label="Open Carousel Studio"

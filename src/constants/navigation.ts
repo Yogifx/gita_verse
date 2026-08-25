@@ -78,6 +78,16 @@ export const APP_NAV: AppRoute[] = [
 ];
 
 export function getRouteByPathname(pathname: string): AppRoute | undefined {
+  if (pathname === "/studio" || pathname.startsWith("/studio/")) {
+    const studio = APP_NAV.find((route) => route.id === "studio");
+    if (studio) {
+      return {
+        ...studio,
+        title: "Creative Workspace",
+        description: "Draft and refine GitaVerse content in the authoring editor.",
+      };
+    }
+  }
   return APP_NAV.find(
     (route) => pathname === route.href || pathname.startsWith(`${route.href}/`),
   );

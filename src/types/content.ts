@@ -5,7 +5,13 @@
  * shape without UI changes.
  */
 
-export type ContentFormat = "carousel" | "post" | "reel";
+/**
+ * `session` is a longer-form teaching document (a class/workshop session)
+ * rather than a social piece — it uses the same Creative Workspace editor and
+ * the same persisted `ContentItem` shape (docs/09_PRODUCT_ARCHITECTURE.md §4.4,
+ * "educational document types").
+ */
+export type ContentFormat = "carousel" | "post" | "reel" | "session";
 
 export type ContentStatus =
   | "draft"
@@ -46,6 +52,11 @@ export type ContentItem = {
   transliteration: string;
   meaning: string;
   keyLearning: string;
+  /**
+   * Authored teaching document as HTML from the Creative Workspace editor
+   * (Tiptap). Optional so GV-011 seed records remain valid until first save.
+   */
+  body?: string;
   platforms: Platform[];
   createdAt: string;
   updatedAt: string;

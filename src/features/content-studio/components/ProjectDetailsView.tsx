@@ -49,8 +49,8 @@ export function ProjectDetailsView({ id }: ProjectDetailsViewProps) {
     );
   }
 
-  function handleDuplicate() {
-    const newId = duplicateContentItem(id);
+  async function handleDuplicate() {
+    const newId = await duplicateContentItem(id);
     if (newId) router.push(`/content/${newId}`);
   }
 
@@ -133,6 +133,15 @@ export function ProjectDetailsView({ id }: ProjectDetailsViewProps) {
             </div>
           ) : null}
 
+          {item.body && item.body !== "<p></p>" ? (
+            <div>
+              <p className="mb-2 text-caption font-medium text-foreground-secondary">Manuscript</p>
+              <div className="gv-editor overflow-hidden rounded-control border border-border bg-background">
+                <div className="tiptap" dangerouslySetInnerHTML={{ __html: item.body }} />
+              </div>
+            </div>
+          ) : null}
+
           <div>
             <p className="mb-2 text-caption font-medium text-foreground-secondary">
               Target platforms
@@ -160,7 +169,7 @@ export function ProjectDetailsView({ id }: ProjectDetailsViewProps) {
             </Link>
             <button
               type="button"
-              onClick={handleDuplicate}
+              onClick={() => void handleDuplicate()}
               className="inline-flex items-center gap-1.5 rounded-control border border-border px-4 py-2 text-caption font-medium text-foreground-secondary transition-colors duration-fast hover:bg-muted hover:text-foreground"
             >
               <Copy className="h-3.5 w-3.5" />

@@ -4,6 +4,10 @@ import { create } from "zustand";
 import type { ContentFormat, ContentItem, Platform } from "@/types/content";
 import type { AppSettings } from "@/types/settings";
 import { apiGet, apiPatch, apiPost } from "@/lib/api/client";
+import {
+  starterBodyForFormat,
+  starterTitleForFormat,
+} from "@/features/content/lib/document-defaults";
 import { usePersistenceStatusStore } from "@/stores/persistence-status-store";
 
 type ContentState = {
@@ -14,9 +18,14 @@ type ContentState = {
   /** Loads persisted content items + daily target. Safe to call multiple times. */
   hydrate: () => Promise<void>;
   /** Creates a new draft content item and returns its id. */
-  createContentItem: (format?: ContentFormat, platforms?: Platform[]) => string;
+  createContentItem: (format?: ContentFormat, platforms?: Platform[]) => Promise<string>;
   /** Clones an existing item as a fresh draft and returns the new id. */
-  duplicateContentItem: (id: string) => string | undefined;
+  duplicateContentItem: (id: string) => Promise<string | undefined>;
+  /** Persists field updates for an existing content item. */
+  updateContentItem: (
+    id: string,
+    patch: Partial<Omit<ContentItem, "id" | "ownerId">>,
+  ) => Promise<ContentItem | undefined>;
   /** Soft-removes an item from active views. History is preserved. */
   archiveContentItem: (id: string) => void;
   /** Adds or removes a target platform on an item. */
@@ -67,14 +76,14 @@ export const useContentStore = create<ContentState>((set, get) => ({
     }
   },
 
-  createContentItem: (format = "post", platforms = []) => {
+  createContentItem: async (format = "post", platforms = []) => {
     const id = nextDraftId();
     const now = new Date().toISOString();
 
     const newItem: ContentItem = {
       id,
       ownerId: "",
-      title: "Untitled idea",
+      title: starterTitleForFormat(format),
       format,
       status: "draft",
       pipelineStage: "idea",
@@ -87,19 +96,25 @@ export const useContentStore = create<ContentState>((set, get) => ({
       transliteration: "",
       meaning: "",
       keyLearning: "",
+      body: starterBodyForFormat(format),
       platforms,
       createdAt: now,
       updatedAt: now,
     };
 
     set((state) => ({ items: [newItem, ...state.items] }));
-    void apiPost("/api/content", newItem).catch((error) =>
-      reportPersistenceError("create content item", error),
-    );
+    try {
+      const created = await apiPost<ContentItem>("/api/content", newItem);
+      set((state) => ({
+        items: state.items.map((item) => (item.id === id ? created : item)),
+      }));
+    } catch (error) {
+      reportPersistenceError("create content item", error);
+    }
     return id;
   },
 
-  duplicateContentItem: (id) => {
+  duplicateContentItem: async (id) => {
     const original = get().items.find((item) => item.id === id);
     if (!original) return undefined;
 
@@ -122,10 +137,37 @@ export const useContentStore = create<ContentState>((set, get) => ({
     };
 
     set((state) => ({ items: [copy, ...state.items] }));
-    void apiPost("/api/content", copy).catch((error) =>
-      reportPersistenceError("duplicate content item", error),
-    );
+    try {
+      const created = await apiPost<ContentItem>("/api/content", copy);
+      set((state) => ({
+        items: state.items.map((item) => (item.id === newId ? created : item)),
+      }));
+    } catch (error) {
+      reportPersistenceError("duplicate content item", error);
+    }
     return newId;
+  },
+
+  updateContentItem: async (id, patch) => {
+    const current = get().items.find((item) => item.id === id);
+    if (!current) return undefined;
+
+    const updatedAt = patch.updatedAt ?? new Date().toISOString();
+    const optimistic: ContentItem = { ...current, ...patch, updatedAt };
+    set((state) => ({
+      items: state.items.map((item) => (item.id === id ? optimistic : item)),
+    }));
+
+    try {
+      const saved = await apiPatch<ContentItem>(`/api/content/${id}`, { ...patch, updatedAt });
+      set((state) => ({
+        items: state.items.map((item) => (item.id === id ? saved : item)),
+      }));
+      return saved;
+    } catch (error) {
+      reportPersistenceError("save content item", error);
+      return undefined;
+    }
   },
 
   archiveContentItem: (id) => {

@@ -10,7 +10,7 @@ type ContentFormatGridProps = {
 export function ContentFormatGrid({ summaries }: ContentFormatGridProps) {
   return (
     <SectionCard title="Content Formats" description="Every piece finds a home here.">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {summaries.map((summary) => {
           const meta = CONTENT_FORMAT_META[summary.format];
           const Icon = meta.icon;

@@ -20,6 +20,8 @@ export function CreateContentDialog({ open, onClose }: CreateContentDialogProps)
   const [format, setFormat] = useState<ContentFormat | null>(null);
   const [platforms, setPlatforms] = useState<Platform[]>([]);
 
+  const [pending, setPending] = useState(false);
+
   function togglePlatform(platform: Platform) {
     setPlatforms((prev) =>
       prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform],
@@ -32,11 +34,16 @@ export function CreateContentDialog({ open, onClose }: CreateContentDialogProps)
     onClose();
   }
 
-  function handleCreate() {
+  async function handleCreate() {
     if (!format) return;
-    const id = createContentItem(format, platforms);
-    handleClose();
-    router.push(`/studio?format=${format}&item=${id}`);
+    setPending(true);
+    try {
+      const id = await createContentItem(format, platforms);
+      handleClose();
+      router.push(`/studio?format=${format}&item=${id}`);
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -49,7 +56,7 @@ export function CreateContentDialog({ open, onClose }: CreateContentDialogProps)
       <div className="flex flex-col gap-5">
         <div>
           <p className="mb-2 text-caption font-medium text-foreground-secondary">Format</p>
-          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {CONTENT_FORMATS.map((option) => {
               const meta = CONTENT_FORMAT_META[option];
               const Icon = meta.icon;
@@ -120,11 +127,11 @@ export function CreateContentDialog({ open, onClose }: CreateContentDialogProps)
           </button>
           <button
             type="button"
-            onClick={handleCreate}
-            disabled={!format}
+            onClick={() => void handleCreate()}
+            disabled={!format || pending}
             className="rounded-control bg-primary px-4 py-2 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Create
+            {pending ? "Creating…" : "Create"}
           </button>
         </div>
       </div>

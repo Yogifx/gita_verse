@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { StudioView } from "@/features/workspace/components/StudioView";
 
 export const metadata: Metadata = {
-  title: "Content Studio",
+  title: "Creative Workspace",
 };
 
 type StudioPageProps = {

@@ -1,5 +1,10 @@
 import type { LucideIcon } from "lucide-react";
-import { Clapperboard, GalleryHorizontal, Image as ImageIcon } from "lucide-react";
+import {
+  Clapperboard,
+  GalleryHorizontal,
+  Image as ImageIcon,
+  Presentation,
+} from "lucide-react";
 import type {
   ContentFormat,
   ContentStatus,
@@ -40,9 +45,14 @@ export const CONTENT_FORMAT_META: Record<
     icon: Clapperboard,
     description: "Vertical video for Reels, Shorts & Stories.",
   },
+  session: {
+    label: "Session",
+    icon: Presentation,
+    description: "Long-form teaching session for a class, workshop, or study group.",
+  },
 };
 
-export const CONTENT_FORMATS: ContentFormat[] = ["carousel", "post", "reel"];
+export const CONTENT_FORMATS: ContentFormat[] = ["carousel", "post", "reel", "session"];
 
 export const PLATFORM_META: Record<Platform, { label: string }> = {
   instagram: { label: "Instagram" },
@@ -76,6 +86,7 @@ export const CONTENT_LIBRARY_FILTERS: { key: ContentFilterKey; label: string }[]
   { key: "carousel", label: "Carousel" },
   { key: "post", label: "Post" },
   { key: "reel", label: "Reel / Short" },
+  { key: "session", label: "Session" },
   { key: "draft", label: "Draft" },
   { key: "in_review", label: "In Review" },
   { key: "approved", label: "Approved" },

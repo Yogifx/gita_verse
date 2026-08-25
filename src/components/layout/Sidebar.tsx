@@ -136,7 +136,9 @@ function SidebarChrome({
       <nav className="flex-1 space-y-1 overflow-y-auto p-2" aria-label="Primary">
         {APP_NAV.map((item) => {
           const active =
-            pathname === item.href || pathname.startsWith(`${item.href}/`);
+            pathname === item.href ||
+            pathname.startsWith(`${item.href}/`) ||
+            (item.id === "studio" && (pathname === "/studio" || pathname.startsWith("/studio/")));
           const Icon = item.icon;
 
           return (
