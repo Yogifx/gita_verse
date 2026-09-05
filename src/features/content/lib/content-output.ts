@@ -16,6 +16,12 @@ import type {
   ReelScene,
 } from "@/types/content-output";
 
+/** Fields the deterministic mapper reads. ContentBrief remains assignable. */
+export type OutputBriefFields = Pick<
+  ContentBrief,
+  "hook" | "keyMessage" | "keyTeaching" | "meaning" | "contentGoal"
+>;
+
 type HostFormat = ContentOutput["format"] | "session";
 
 const SLIDE_ROLES: CarouselSlideRole[] = ["cover", "content", "close"];
@@ -43,7 +49,7 @@ export function assertContentOutput(
   throw new ValidationError("Structured output is only defined for Reel, Carousel, and Post.");
 }
 
-export function outputFromBrief(brief: ContentBrief, format: HostFormat): ContentOutput {
+export function outputFromBrief(brief: OutputBriefFields, format: HostFormat): ContentOutput {
   if (format === "reel") return reelFromBrief(brief);
   if (format === "carousel") return carouselFromBrief(brief);
   if (format === "post") return postFromBrief(brief);
@@ -105,7 +111,7 @@ export function audienceLineFromBrief(brief: ContentBrief): string {
   return `${labelForAudience(brief.audience)} · ${labelForTone(brief.tone)}`;
 }
 
-function reelFromBrief(brief: ContentBrief): ReelOutput {
+function reelFromBrief(brief: OutputBriefFields): ReelOutput {
   const scenes: ReelScene[] = [
     {
       voiceover: brief.keyMessage.trim(),
@@ -137,7 +143,7 @@ function reelFromBrief(brief: ContentBrief): ReelOutput {
   };
 }
 
-function carouselFromBrief(brief: ContentBrief): CarouselOutput {
+function carouselFromBrief(brief: OutputBriefFields): CarouselOutput {
   const slides: CarouselSlide[] = [
     { role: "cover", headline: brief.hook.trim() || brief.keyMessage.trim(), body: "" },
     { role: "content", headline: "Key message", body: brief.keyMessage.trim() },
@@ -158,7 +164,7 @@ function carouselFromBrief(brief: ContentBrief): CarouselOutput {
   return { format: "carousel", slides };
 }
 
-function postFromBrief(brief: ContentBrief): PostOutput {
+function postFromBrief(brief: OutputBriefFields): PostOutput {
   return {
     format: "post",
     headline: brief.hook.trim() || brief.keyMessage.trim(),

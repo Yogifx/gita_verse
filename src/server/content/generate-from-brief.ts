@@ -1,13 +1,14 @@
 /**
- * GV-015.2 / GV-015.3 / GV-015.4 generate action: Content Brief → one
- * ContentItem via the server-side generation port, then existing
- * validation and one-way HTML projection. No job table, no provider,
- * no prompt store. Sanskrit stays in GV-014.
+ * GV-015.2–015.5 generate action: Content Brief → GenerationRequest →
+ * generation port → validated ContentOutput → HTML body → ContentItem.
+ * No job table, no provider, no prompt store. Sanskrit stays in GV-014.
  */
 
 import { randomUUID } from "node:crypto";
 import {
   contentFormatFromBrief,
+  generationFormatFromContent,
+  generationRequestFromBrief,
   titleFromGenerationInput,
   unsupportedBriefFormatMessage,
   type GenerationInput,
@@ -35,7 +36,8 @@ export async function generateContentItemFromBrief(
 
   const brief = await getContentBrief(id, ownerId);
 
-  const format = contentFormatFromBrief(brief.format);
+  const contentFormat = contentFormatFromBrief(brief.format);
+  const format = contentFormat ? generationFormatFromContent(contentFormat) : null;
   if (!format) {
     throw new ValidationError(unsupportedBriefFormatMessage(brief.format));
   }
@@ -48,7 +50,8 @@ export async function generateContentItemFromBrief(
 
   const citation = await getVerseCitationByAddress(brief.verseId);
   const input: GenerationInput = { brief, citation, format };
-  const generated = await getGenerationPort().generate(input);
+  const request = generationRequestFromBrief(brief, citation, format);
+  const generated = await getGenerationPort().generate(request);
   const output = assertContentOutput(generated, format);
   const body = htmlFromContentOutput(output, {
     citationLabel: citation.label,

@@ -1,23 +1,33 @@
 /**
- * GV-015.4 server-side generation port.
+ * GV-015.4 / GV-015.5 server-side generation port.
  *
- * Application boundary for structured content generation. Not an AI
- * provider, not a prompt store, and not a job runner. The first
- * implementation delegates to the existing deterministic mapper.
+ * Application boundary for structured content generation. Accepts a
+ * provider-neutral GenerationRequest. Not an AI provider, prompt store,
+ * or job runner. The only implementation is the existing deterministic
+ * mapper.
  */
 
-import type { GenerationInput } from "@/features/content/lib/brief-generation";
+import type { GenerationRequest } from "@/features/content/lib/brief-generation";
 import { outputFromBrief } from "@/features/content/lib/content-output";
 import type { ContentOutput } from "@/types/content";
 
 export type GenerationPort = {
-  generate(input: GenerationInput): Promise<ContentOutput>;
+  generate(request: GenerationRequest): Promise<ContentOutput>;
 };
 
 export function createDeterministicGenerationPort(): GenerationPort {
   return {
-    async generate(input) {
-      return outputFromBrief(input.brief, input.format);
+    async generate(request) {
+      return outputFromBrief(
+        {
+          hook: request.hook,
+          keyMessage: request.keyMessage,
+          keyTeaching: request.keyTeaching,
+          meaning: request.meaning,
+          contentGoal: request.contentGoal,
+        },
+        request.format,
+      );
     },
   };
 }

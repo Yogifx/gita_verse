@@ -1,9 +1,9 @@
 /**
- * GV-015.2 application-layer generation helpers.
+ * GV-015.2 / GV-015.5 application-layer generation helpers.
  *
- * This is not a prompt framework. `GenerationInput` is the shared input
- * contract for the server-side generation port. Format/title helpers stay
- * here; structured output is produced through that port.
+ * This is not a prompt framework. Format/title helpers stay here.
+ * `GenerationRequest` is the provider-neutral port input. Structured
+ * output is produced through GenerationPort.
  */
 
 import { GENERATABLE_BRIEF_FORMATS, labelForBriefFormat } from "@/constants/briefs";
@@ -12,11 +12,62 @@ import type { BriefFormat, ContentBrief } from "@/types/brief";
 import type { ContentFormat } from "@/types/content";
 import type { VerseCitation } from "@/types/knowledge";
 
+export type GenerationFormat = "reel" | "carousel" | "post";
+
+/** Read-only verse identity for generation. Not a knowledge record. */
+export type GenerationCitationContext = {
+  verseId: string;
+  label: string;
+  reference: string;
+  chapter: number;
+  verse: number;
+};
+
+/**
+ * Provider-neutral generation input. Planning fields + citation context
+ * only. No owner, provider, model, prompt, or credentials.
+ */
+export type GenerationRequest = {
+  format: GenerationFormat;
+  hook: string;
+  keyMessage: string;
+  keyTeaching: string;
+  meaning: string;
+  contentGoal: string;
+  citation: GenerationCitationContext;
+};
+
 export type GenerationInput = {
   brief: ContentBrief;
   citation: VerseCitation;
   format: ContentFormat;
 };
+
+export function generationFormatFromContent(format: ContentFormat): GenerationFormat | null {
+  return format === "reel" || format === "carousel" || format === "post" ? format : null;
+}
+
+export function generationRequestFromBrief(
+  brief: ContentBrief,
+  citation: VerseCitation,
+  format: GenerationFormat,
+): GenerationRequest {
+  return {
+    format,
+    hook: brief.hook,
+    keyMessage: brief.keyMessage,
+    keyTeaching: brief.keyTeaching,
+    meaning: brief.meaning,
+    contentGoal: brief.contentGoal,
+    citation: {
+      verseId: citation.id,
+      label: citation.label,
+      reference: citation.reference,
+      chapter: citation.chapter,
+      verse: citation.verse,
+    },
+  };
+}
 
 export function contentFormatFromBrief(format: BriefFormat): ContentFormat | null {
   return (GENERATABLE_BRIEF_FORMATS as string[]).includes(format)
