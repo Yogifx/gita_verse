@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { GenerationProviderError } from "@/lib/ai/generation-error";
 import {
   DuplicateRecordError,
   NotFoundError,
@@ -36,6 +37,14 @@ export function jsonError(error: unknown): NextResponse {
       { status: 503 },
     );
   }
+  if (error instanceof GenerationProviderError) {
+    // eslint-disable-next-line no-console
+    console.error("[GitaVerse] generation provider error:", error.code);
+    return NextResponse.json(
+      { error: { message: error.message, code: error.code } },
+      { status: statusForProviderError(error.code) },
+    );
+  }
 
   // eslint-disable-next-line no-console
   console.error("[GitaVerse] unexpected API error:", error);
@@ -43,4 +52,10 @@ export function jsonError(error: unknown): NextResponse {
     { error: { message: "Something went wrong on the server.", code: "internal_error" } },
     { status: 500 },
   );
+}
+
+function statusForProviderError(code: GenerationProviderError["code"]): number {
+  if (code === "rate_limited") return 429;
+  if (code === "invalid_response") return 502;
+  return 503;
 }
