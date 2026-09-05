@@ -1,20 +1,15 @@
 /**
  * GV-015.2 application-layer generation helpers.
  *
- * This is not a prompt framework. It maps a Content Brief + one supported
- * ContentFormat into a structured ContentItem draft. A later provider can
- * consume the same `GenerationInput` without a giant universal prompt.
+ * This is not a prompt framework. `GenerationInput` is the shared input
+ * contract for the server-side generation port. Format/title helpers stay
+ * here; structured output is produced through that port.
  */
 
 import { GENERATABLE_BRIEF_FORMATS, labelForBriefFormat } from "@/constants/briefs";
 import { CONTENT_FORMAT_META } from "@/constants/content";
-import {
-  audienceLineFromBrief,
-  htmlFromContentOutput,
-  outputFromBrief,
-} from "@/features/content/lib/content-output";
 import type { BriefFormat, ContentBrief } from "@/types/brief";
-import type { ContentFormat, ContentOutput } from "@/types/content";
+import type { ContentFormat } from "@/types/content";
 import type { VerseCitation } from "@/types/knowledge";
 
 export type GenerationInput = {
@@ -44,22 +39,4 @@ export function titleFromGenerationInput(input: GenerationInput): string {
     return first.length > 80 ? `${first.slice(0, 77)}…` : first;
   }
   return `${CONTENT_FORMAT_META[input.format].label} · ${input.citation.label}`;
-}
-
-/**
- * One-way generate path: structured output first, then HTML for the editor.
- * Does not copy verified Sanskrit. Verse identity is a citation label only.
- */
-export function draftFromGenerationInput(input: GenerationInput): {
-  output: ContentOutput;
-  body: string;
-} {
-  const output = outputFromBrief(input.brief, input.format);
-  return {
-    output,
-    body: htmlFromContentOutput(output, {
-      citationLabel: input.citation.label,
-      audienceLine: audienceLineFromBrief(input.brief),
-    }),
-  };
 }

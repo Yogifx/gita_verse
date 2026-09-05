@@ -1,17 +1,23 @@
 /**
- * GV-015.2 / GV-015.3 generate action: Content Brief → one ContentItem
- * with structured `output` and a one-way HTML `body` projection.
- * No job table, no provider, no prompt store. Sanskrit stays in GV-014.
+ * GV-015.2 / GV-015.3 / GV-015.4 generate action: Content Brief → one
+ * ContentItem via the server-side generation port, then existing
+ * validation and one-way HTML projection. No job table, no provider,
+ * no prompt store. Sanskrit stays in GV-014.
  */
 
 import { randomUUID } from "node:crypto";
 import {
   contentFormatFromBrief,
-  draftFromGenerationInput,
   titleFromGenerationInput,
   unsupportedBriefFormatMessage,
   type GenerationInput,
 } from "@/features/content/lib/brief-generation";
+import {
+  assertContentOutput,
+  audienceLineFromBrief,
+  htmlFromContentOutput,
+} from "@/features/content/lib/content-output";
+import { getGenerationPort } from "@/server/content/generation-port";
 import { getContentBrief } from "@/server/repositories/briefs.repository";
 import { createContentItem } from "@/server/repositories/content.repository";
 import { getVerseCitationByAddress } from "@/server/repositories/knowledge.repository";
@@ -42,7 +48,12 @@ export async function generateContentItemFromBrief(
 
   const citation = await getVerseCitationByAddress(brief.verseId);
   const input: GenerationInput = { brief, citation, format };
-  const { output, body } = draftFromGenerationInput(input);
+  const generated = await getGenerationPort().generate(input);
+  const output = assertContentOutput(generated, format);
+  const body = htmlFromContentOutput(output, {
+    citationLabel: citation.label,
+    audienceLine: audienceLineFromBrief(brief),
+  });
   const now = new Date().toISOString();
 
   return createContentItem({
