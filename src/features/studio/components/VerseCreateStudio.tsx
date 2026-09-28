@@ -6,17 +6,16 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Clapperboard, GalleryHorizontal, Image as ImageIcon, LoaderCircle, Sparkles } from "lucide-react";
 import { fetchVerseCitation } from "@/features/knowledge/lib/client";
 import { formatReference, formatVerseId, parseVerseAddress } from "@/features/knowledge/lib/reference";
+import { VerseSourcePicker } from "@/features/briefs/components/VerseSourcePicker";
 import { useBriefStore } from "@/features/briefs/store/use-brief-store";
 import { useContentStore } from "@/features/content/store/use-content-store";
 import { useProjectsStore } from "@/features/projects/store/use-projects-store";
 import { CreationJourney } from "@/features/studio/components/CreationJourney";
-import { VerseSourcePanel } from "@/features/studio/components/VerseSourcePanel";
 import { studioHref } from "@/features/studio/lib/studio-routes";
 import {
   FEATURED_VERSE_ADDRESS,
   briefDraftFromVerseSource,
   resolveStudioProjectId,
-  reusableBriefForVerse,
   sourceItemForVerse,
 } from "@/features/studio/lib/verse-create";
 import { DEFAULT_PUBLISH_PLATFORMS } from "@/features/studio/lib/creation-status";
@@ -64,55 +63,66 @@ export function VerseCreateStudio({ verse, format }: VerseCreateStudioProps) {
   const isContentHydrated = useContentStore((state) => state.isHydrated);
   const generateFromBrief = useContentStore((state) => state.generateFromBrief);
   const updateContentItem = useContentStore((state) => state.updateContentItem);
-  const briefs = useBriefStore((state) => state.briefs);
   const createBrief = useBriefStore((state) => state.createBrief);
   const projects = useProjectsStore((state) => state.projects);
   const isProjectsHydrated = useProjectsStore((state) => state.isHydrated);
 
-  const address = parseVerseAddress(verse?.trim() || FEATURED_VERSE_ADDRESS);
-  const resolvedAddress = address
-    ? formatReference(address.chapter, address.verse)
-    : FEATURED_VERSE_ADDRESS;
-  const parsed = parseVerseAddress(resolvedAddress) ?? { chapter: 2, verse: 47 };
+  const initialAddress =
+    parseVerseAddress(verse?.trim() || FEATURED_VERSE_ADDRESS) ??
+    parseVerseAddress(FEATURED_VERSE_ADDRESS)!;
+  const [selectedVerseId, setSelectedVerseId] = useState(() =>
+    formatVerseId(initialAddress.chapter, initialAddress.verse),
+  );
+  const selectedAddress = parseVerseAddress(selectedVerseId) ?? initialAddress;
 
   const initialFormat =
     format === "carousel" || format === "post" || format === "reel" ? format : "reel";
 
   const [citation, setCitation] = useState<VerseCitation | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [meaning, setMeaning] = useState("");
+  const [keyTeaching, setKeyTeaching] = useState("");
   const [selectedFormat, setSelectedFormat] = useState<
     Extract<BriefFormat, "reel" | "carousel" | "post">
   >(initialFormat);
   const [pending, setPending] = useState(false);
   const [generateError, setGenerateError] = useState<string | null>(null);
 
+  const sourceItem = useMemo(
+    () => sourceItemForVerse(items, selectedAddress.chapter, selectedAddress.verse),
+    [items, selectedAddress.chapter, selectedAddress.verse],
+  );
+
   useEffect(() => {
+    if (citation || !selectedVerseId) return;
     let cancelled = false;
-    setCitation(null);
-    setLoadError(null);
-    void fetchVerseCitation(resolvedAddress)
-      .then((result) => {
-        if (!cancelled) setCitation(result);
+    void fetchVerseCitation(formatReference(selectedAddress.chapter, selectedAddress.verse))
+      .then((found) => {
+        if (!cancelled) setCitation(found);
       })
-      .catch((error) => {
-        if (cancelled) return;
-        setLoadError(
-          error instanceof ApiError
-            ? error.message
-            : "Couldn't load this verse from the Knowledge Layer.",
-        );
+      .catch(() => {
+        if (!cancelled) setGenerateError("Couldn't load that verse from the Knowledge Layer.");
       });
     return () => {
       cancelled = true;
     };
-  }, [resolvedAddress]);
+  }, [
+    citation,
+    selectedAddress.chapter,
+    selectedAddress.verse,
+    selectedVerseId,
+  ]);
 
-  const sourceItem = useMemo(
-    () => sourceItemForVerse(items, parsed.chapter, parsed.verse),
-    [items, parsed.chapter, parsed.verse],
-  );
-  const meaning = sourceItem?.meaning ?? "";
-  const keyTeaching = sourceItem?.keyLearning ?? meaning;
+  useEffect(() => {
+    const sourceMeaning = sourceItem?.meaning ?? "";
+    setMeaning(sourceMeaning);
+    setKeyTeaching(sourceItem?.keyLearning ?? sourceMeaning);
+  }, [selectedVerseId, sourceItem]);
+
+  function handleVerseChange(verseId: string, nextCitation: VerseCitation | null) {
+    setSelectedVerseId(verseId);
+    setCitation(nextCitation);
+    setGenerateError(null);
+  }
 
   async function handleGenerate() {
     if (!citation || pending) return;
@@ -130,19 +140,17 @@ export function VerseCreateStudio({ verse, format }: VerseCreateStudioProps) {
     setGenerateError(null);
 
     try {
-      const verseId = citation.id || formatVerseId(parsed.chapter, parsed.verse);
-      const existing = reusableBriefForVerse(briefs, verseId, selectedFormat);
-      const brief =
-        existing ??
-        (await createBrief(
-          briefDraftFromVerseSource({
-            projectId,
-            verseId,
-            format: selectedFormat,
-            meaning,
-            keyTeaching,
-          }),
-        ));
+      const verseId =
+        citation.id || formatVerseId(selectedAddress.chapter, selectedAddress.verse);
+      const brief = await createBrief(
+        briefDraftFromVerseSource({
+          projectId,
+          verseId,
+          format: selectedFormat,
+          meaning,
+          keyTeaching,
+        }),
+      );
 
       if (!brief) {
         setGenerateError("Couldn't save the content brief for this verse.");
@@ -183,27 +191,55 @@ export function VerseCreateStudio({ verse, format }: VerseCreateStudioProps) {
         <p className="text-caption font-medium text-gold">Create once · Adapt everywhere</p>
         <h1 className="mt-1 font-display text-h2 text-foreground">Create content from a verified verse</h1>
         <p className="mt-2 max-w-2xl text-caption text-foreground-secondary">
-          Start with Chapter {parsed.chapter} · Verse {parsed.verse}. Choose Reel, Carousel, or Post,
-          generate a structured draft, then review and approve it.
+          Select a verified source, choose Reel, Carousel, or Post, generate a structured draft,
+          then review and approve it. Chapter 2 · Verse 47 is selected by default.
         </p>
         <div className="mt-5">
           <CreationJourney current={pending ? "generate" : "create"} />
         </div>
       </section>
 
-      {loadError ? (
-        <p className="rounded-control border border-danger-muted bg-danger-muted/40 px-4 py-3 text-caption text-danger">
-          {loadError}
+      <section className="rounded-panel border border-border bg-surface p-4 md:p-6">
+        <h2 className="font-display text-h3 text-foreground">Select verified verse</h2>
+        <p className="mt-1 text-caption text-foreground-secondary">
+          Sanskrit and IAST are read directly from the existing Knowledge Layer.
         </p>
-      ) : null}
-
-      {!citation && !loadError ? (
-        <div className="rounded-panel border border-dashed border-border bg-surface/60 px-6 py-16 text-center text-caption text-foreground-muted">
-          Loading verified verse…
+        <div className="mt-4">
+          <VerseSourcePicker verseId={selectedVerseId} onChange={handleVerseChange} />
         </div>
-      ) : null}
 
-      {citation ? <VerseSourcePanel citation={citation} meaning={meaning} /> : null}
+        {citation ? (
+          <div className="mt-5 grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <label className="flex flex-col gap-1.5">
+              <span className="text-caption font-medium text-foreground-secondary">
+                Simplified meaning
+              </span>
+              <textarea
+                value={meaning}
+                rows={4}
+                onChange={(event) => setMeaning(event.target.value)}
+                placeholder="Write the creator-facing meaning used to ground this draft."
+                className="resize-y rounded-control border border-border bg-background px-3 py-2 text-body text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+              <span className="text-small text-foreground-muted">
+                Saved on the Content Brief; the verified verse is not modified.
+              </span>
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-caption font-medium text-foreground-secondary">
+                Key teaching
+              </span>
+              <textarea
+                value={keyTeaching}
+                rows={4}
+                onChange={(event) => setKeyTeaching(event.target.value)}
+                placeholder="State the teaching the content should communicate."
+                className="resize-y rounded-control border border-border bg-background px-3 py-2 text-body text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-ring"
+              />
+            </label>
+          </div>
+        ) : null}
+      </section>
 
       <section className="rounded-panel border border-border bg-surface p-4 md:p-6">
         <h2 className="font-display text-h3 text-foreground">Choose a format</h2>
