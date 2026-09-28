@@ -7,6 +7,7 @@ import { CONTENT_FORMATS } from "@/constants/content";
 import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
 import { CreativeWorkspace } from "@/features/workspace/components/CreativeWorkspace";
 import { FormatStartView } from "@/features/workspace/components/FormatStartView";
+import { ReviewStudio } from "@/features/studio/components/ReviewStudio";
 import type { ContentFormat } from "@/types/content";
 
 type StudioViewProps = {
@@ -44,6 +45,13 @@ export function StudioView({ format, itemId }: StudioViewProps) {
           </Link>
         </div>
       );
+    }
+    if (
+      item.output?.format === "reel" ||
+      item.output?.format === "carousel" ||
+      item.output?.format === "post"
+    ) {
+      return <ReviewStudio item={item} />;
     }
     return <CreativeWorkspace item={item} />;
   }

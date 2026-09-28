@@ -78,6 +78,26 @@ export const APP_NAV: AppRoute[] = [
 ];
 
 export function getRouteByPathname(pathname: string): AppRoute | undefined {
+  if (pathname === "/studio/create" || pathname.startsWith("/studio/create")) {
+    const studio = APP_NAV.find((route) => route.id === "studio");
+    if (studio) {
+      return {
+        ...studio,
+        title: "Create Content",
+        description: "Create a structured draft from a verified Bhagavad Gita verse.",
+      };
+    }
+  }
+  if (pathname === "/studio/review" || pathname.startsWith("/studio/review")) {
+    const studio = APP_NAV.find((route) => route.id === "studio");
+    if (studio) {
+      return {
+        ...studio,
+        title: "Review Studio",
+        description: "Review, edit, and approve generated content before publishing.",
+      };
+    }
+  }
   if (pathname === "/studio/brief" || pathname.startsWith("/studio/brief")) {
     const studio = APP_NAV.find((route) => route.id === "studio");
     if (studio) {

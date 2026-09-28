@@ -17,6 +17,7 @@ import { WorkflowTracker } from "@/features/content-studio/components/WorkflowTr
 import { PlatformTargetPicker } from "@/features/content-studio/components/PlatformTargetPicker";
 import { formatDate, formatRelativeTime } from "@/lib/utils/time";
 import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
+import { studioHref } from "@/features/studio/lib/studio-routes";
 
 type ProjectDetailsViewProps = {
   id: string;
@@ -182,14 +183,14 @@ export function ProjectDetailsView({ id }: ProjectDetailsViewProps) {
 
           <div className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
             <Link
-              href={`/studio?format=${item.format}&item=${item.id}`}
+              href={studioHref(item)}
               className="inline-flex items-center gap-1.5 rounded-control bg-primary px-4 py-2 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
             >
               <Pencil className="h-3.5 w-3.5" />
               Edit
             </Link>
             <Link
-              href={`/studio?format=${item.format}&item=${item.id}`}
+              href={studioHref(item)}
               className="inline-flex items-center gap-1.5 rounded-control border border-border px-4 py-2 text-caption font-medium text-foreground-secondary transition-colors duration-fast hover:bg-muted hover:text-foreground"
             >
               <Eye className="h-3.5 w-3.5" />

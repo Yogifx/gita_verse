@@ -49,10 +49,20 @@ export function assertContentOutput(
   throw new ValidationError("Structured output is only defined for Reel, Carousel, and Post.");
 }
 
-export function outputFromBrief(brief: OutputBriefFields, format: HostFormat): ContentOutput {
-  if (format === "reel") return reelFromBrief(brief);
-  if (format === "carousel") return carouselFromBrief(brief);
-  if (format === "post") return postFromBrief(brief);
+/** Display-only citation context. Never carries Sanskrit. */
+export type OutputCitationContext = {
+  label?: string;
+  reference?: string;
+};
+
+export function outputFromBrief(
+  brief: OutputBriefFields,
+  format: HostFormat,
+  citation?: OutputCitationContext,
+): ContentOutput {
+  if (format === "reel") return reelFromBrief(brief, citation);
+  if (format === "carousel") return carouselFromBrief(brief, citation);
+  if (format === "post") return postFromBrief(brief, citation);
   throw new ValidationError("Structured output is only defined for Reel, Carousel, and Post.");
 }
 
@@ -102,7 +112,9 @@ export function htmlFromContentOutput(
   return joinBlocks([
     ...lead,
     labeledBlock("Headline", output.headline),
+    labeledBlock("Key message", output.keyMessage ?? "", 3),
     labeledBlock("Body", output.body),
+    labeledBlock("Visual direction", output.visualDirection ?? "", 3),
     labeledBlock("CTA", output.cta),
   ]);
 }
@@ -111,65 +123,146 @@ export function audienceLineFromBrief(brief: ContentBrief): string {
   return `${labelForAudience(brief.audience)} · ${labelForTone(brief.tone)}`;
 }
 
-function reelFromBrief(brief: OutputBriefFields): ReelOutput {
-  const scenes: ReelScene[] = [
-    {
-      voiceover: brief.keyMessage.trim(),
-      onScreenText: brief.keyMessage.trim(),
-      visualDirection: "",
-    },
-  ];
-  if (brief.keyTeaching.trim()) {
+function reelFromBrief(brief: OutputBriefFields, citation?: OutputCitationContext): ReelOutput {
+  const hook = brief.hook.trim() || brief.keyMessage.trim();
+  const keyMessage = brief.keyMessage.trim();
+  const teaching = brief.keyTeaching.trim();
+  const meaning = brief.meaning.trim();
+  const goal = brief.contentGoal.trim();
+  const verseLabel = citation?.label?.trim() || "this verse";
+
+  const scenes: ReelScene[] = [];
+  pushReelScene(scenes, {
+    voiceover: keyMessage || hook,
+    onScreenText: firstOnScreenLine(keyMessage || hook),
+    visualDirection: `Open on a still, grounded frame. Hold ${verseLabel} as the source of the teaching. Do not display invented scripture. Soft light, unhurried pace.`,
+  });
+  pushReelScene(scenes, {
+    voiceover: teaching,
+    onScreenText: firstOnScreenLine(teaching),
+    visualDirection:
+      "Cut to a quiet work scene — hands at a desk, a path being walked, or a simple daily task. Keep motion simple so the teaching can land.",
+  });
+  pushReelScene(scenes, {
+    voiceover: meaning,
+    onScreenText: firstOnScreenLine(meaning),
+    visualDirection:
+      "Return to a close portrait or contemplative landscape. On-screen text stays short. Speak the simplified meaning; do not rewrite the verse.",
+  });
+  pushReelScene(scenes, {
+    voiceover: goal,
+    onScreenText: firstOnScreenLine(goal),
+    visualDirection: "Hold a final still. Give the viewer one breath before the close.",
+  });
+
+  if (scenes.length === 0) {
     scenes.push({
-      voiceover: brief.keyTeaching.trim(),
-      onScreenText: brief.keyTeaching.trim(),
-      visualDirection: "",
-    });
-  }
-  if (brief.meaning.trim()) {
-    scenes.push({
-      voiceover: brief.meaning.trim(),
-      onScreenText: brief.meaning.trim(),
-      visualDirection: "",
+      voiceover: hook,
+      onScreenText: firstOnScreenLine(hook),
+      visualDirection: `A single still frame grounded in ${verseLabel}.`,
     });
   }
 
   return {
     format: "reel",
-    hook: brief.hook.trim() || brief.keyMessage.trim(),
+    hook,
     scenes,
-    closing: brief.contentGoal.trim(),
-    cta: "",
+    closing: goal || teaching || meaning || hook,
+    cta: `Save this teaching from ${verseLabel}. Return to the work in front of you.`,
   };
 }
 
-function carouselFromBrief(brief: OutputBriefFields): CarouselOutput {
+function pushReelScene(scenes: ReelScene[], scene: ReelScene): void {
+  const voiceover = scene.voiceover.trim();
+  if (!voiceover) return;
+  if (scenes.some((entry) => entry.voiceover.trim() === voiceover)) return;
+  scenes.push({
+    voiceover,
+    onScreenText: scene.onScreenText.trim() || firstOnScreenLine(voiceover),
+    visualDirection: scene.visualDirection.trim(),
+  });
+}
+
+function firstOnScreenLine(value: string, max = 86): string {
+  const line = value.trim().split(/\n/)[0] ?? "";
+  if (line.length <= max) return line;
+  return `${line.slice(0, max - 1).trim()}…`;
+}
+
+function carouselFromBrief(
+  brief: OutputBriefFields,
+  citation?: OutputCitationContext,
+): CarouselOutput {
+  const hook = brief.hook.trim() || brief.keyMessage.trim();
+  const keyMessage = brief.keyMessage.trim();
+  const teaching = brief.keyTeaching.trim();
+  const meaning = brief.meaning.trim();
+  const goal = brief.contentGoal.trim();
+  const verseLabel = citation?.label?.trim() || "this verse";
+
   const slides: CarouselSlide[] = [
-    { role: "cover", headline: brief.hook.trim() || brief.keyMessage.trim(), body: "" },
-    { role: "content", headline: "Key message", body: brief.keyMessage.trim() },
+    {
+      role: "cover",
+      headline: hook,
+      body: verseLabel,
+      visualDirection: `Opening title card. Large type, quiet background. Cite ${verseLabel} without inventing scripture.`,
+    },
   ];
-  if (brief.keyTeaching.trim()) {
-    slides.push({
-      role: "content",
-      headline: "Teaching",
-      body: brief.keyTeaching.trim(),
-    });
-  }
+  pushCarouselSlide(slides, {
+    role: "content",
+    headline: "Key message",
+    body: keyMessage,
+    visualDirection: "A single teaching line on a still frame. Generous margins, unhurried read.",
+  });
+  pushCarouselSlide(slides, {
+    role: "content",
+    headline: "Teaching",
+    body: teaching,
+    visualDirection: "Keep the type hierarchy simple. One idea per slide.",
+  });
+  pushCarouselSlide(slides, {
+    role: "content",
+    headline: "Meaning",
+    body: meaning,
+    visualDirection: "Softer light. Let the simplified meaning sit without decorative ornament.",
+  });
   slides.push({
     role: "close",
     headline: "Takeaway",
-    body: brief.contentGoal.trim(),
-    cta: "",
+    body: goal || teaching || meaning || hook,
+    visualDirection: "Final still. Leave space for the CTA.",
+    cta: `Save this teaching from ${verseLabel}. Return to the work in front of you.`,
   });
   return { format: "carousel", slides };
 }
 
-function postFromBrief(brief: OutputBriefFields): PostOutput {
+function pushCarouselSlide(slides: CarouselSlide[], slide: CarouselSlide): void {
+  const body = slide.body.trim();
+  if (!body) return;
+  if (slides.some((entry) => entry.body.trim() === body)) return;
+  slides.push({
+    ...slide,
+    headline: slide.headline.trim(),
+    body,
+    visualDirection: slide.visualDirection?.trim() || undefined,
+    cta: slide.cta?.trim() || undefined,
+  });
+}
+
+function postFromBrief(brief: OutputBriefFields, citation?: OutputCitationContext): PostOutput {
+  const hook = brief.hook.trim() || brief.keyMessage.trim();
+  const keyMessage = brief.keyMessage.trim() || brief.keyTeaching.trim();
+  const meaning = brief.meaning.trim();
+  const goal = brief.contentGoal.trim();
+  const verseLabel = citation?.label?.trim() || "this verse";
+
   return {
     format: "post",
-    headline: brief.hook.trim() || brief.keyMessage.trim(),
-    body: [brief.keyMessage.trim(), brief.meaning.trim()].filter(Boolean).join("\n\n"),
-    cta: brief.contentGoal.trim(),
+    headline: hook,
+    keyMessage,
+    body: [keyMessage, meaning].filter(Boolean).join("\n\n"),
+    visualDirection: `Single-frame feed teaching. Center the hook. Hold ${verseLabel} as a quiet citation, not as invented scripture.`,
+    cta: goal || `Sit with this teaching from ${verseLabel}, then return to the work in front of you.`,
   };
 }
 
@@ -244,6 +337,14 @@ function assertPost(value: object): PostOutput {
     headline: requiredString(record.headline, "Post headline"),
     body: requiredString(record.body, "Post body"),
     cta: requiredString(record.cta, "Post CTA", true),
+    keyMessage:
+      record.keyMessage === undefined
+        ? undefined
+        : requiredString(record.keyMessage, "Post key message", true),
+    visualDirection:
+      record.visualDirection === undefined
+        ? undefined
+        : requiredString(record.visualDirection, "Post visual direction", true),
   };
 }
 

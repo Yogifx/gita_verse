@@ -196,5 +196,7 @@ function describeOutputContract(format: GenerationRequest["format"]): unknown {
     headline: "string",
     body: "string",
     cta: "string",
+    keyMessage: "optional string",
+    visualDirection: "optional string",
   };
 }

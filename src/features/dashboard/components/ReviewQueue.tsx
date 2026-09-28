@@ -5,6 +5,7 @@ import { CONTENT_FORMAT_META } from "@/constants/content";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { FormatBadge } from "@/components/shared/FormatBadge";
 import { SectionCard } from "@/components/shared/SectionCard";
+import { studioHref } from "@/features/studio/lib/studio-routes";
 
 type ReviewQueueProps = {
   items: ContentItem[];
@@ -45,7 +46,7 @@ export function ReviewQueue({ items }: ReviewQueueProps) {
                   <FormatBadge format={item.format} />
                   <StatusBadge status={item.status} />
                   <Link
-                    href={`/studio?format=${item.format}&item=${item.id}`}
+                    href={studioHref(item)}
                     className="inline-flex items-center gap-1.5 rounded-control bg-primary px-3 py-1.5 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
                   >
                     <Eye className="h-3.5 w-3.5" />

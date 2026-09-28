@@ -40,6 +40,10 @@ export type PostOutput = {
   headline: string;
   body: string;
   cta: string;
+  /** Optional structured teaching line. Existing posts may omit it. */
+  keyMessage?: string;
+  /** Optional single-frame art direction. Existing posts may omit it. */
+  visualDirection?: string;
 };
 
 export type ContentOutput = ReelOutput | CarouselOutput | PostOutput;

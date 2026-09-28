@@ -7,6 +7,7 @@ import { FormatBadge } from "@/components/shared/FormatBadge";
 import { DailyBucketBadge } from "@/features/content-studio/components/DailyBucketBadge";
 import { getDailyBucket } from "@/features/content/lib/selectors";
 import { formatRelativeTime } from "@/lib/utils/time";
+import { studioHref } from "@/features/studio/lib/studio-routes";
 
 type ContentCardProps = {
   item: ContentItem;
@@ -65,7 +66,7 @@ export function ContentCard({ item }: ContentCardProps) {
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
           <Link
-            href={`/studio?format=${item.format}&item=${item.id}`}
+            href={studioHref(item)}
             className="inline-flex items-center gap-1 font-medium text-gold transition-colors duration-fast hover:underline"
           >
             <Pencil className="h-3.5 w-3.5" />

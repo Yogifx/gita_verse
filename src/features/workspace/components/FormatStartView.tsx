@@ -11,6 +11,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { getActiveItems } from "@/features/content/lib/selectors";
 import type { ContentFormat } from "@/types/content";
 import { cn } from "@/lib/utils/cn";
+import { studioHref, verseCreateHref } from "@/features/studio/lib/studio-routes";
 
 type FormatStartViewProps = {
   format?: ContentFormat;
@@ -54,6 +55,10 @@ export function FormatStartView({ format }: FormatStartViewProps) {
         </p>
         <p className="mt-2 text-caption text-foreground-secondary">
           Prefer starting from a verified verse?{" "}
+          <Link href={verseCreateHref("2.47", "reel")} className="font-medium text-gold hover:underline">
+            Create from Chapter 2 Verse 47
+          </Link>
+          {" · "}
           <Link href="/studio/brief" className="font-medium text-gold hover:underline">
             Open a Content Brief
           </Link>
@@ -128,7 +133,7 @@ export function FormatStartView({ format }: FormatStartViewProps) {
                   <FormatBadge format={item.format} />
                   <StatusBadge status={item.status} />
                   <Link
-                    href={`/studio?format=${item.format}&item=${item.id}`}
+                    href={studioHref(item)}
                     className="rounded-control border border-border px-3 py-1.5 text-caption font-medium text-foreground-secondary transition-colors duration-fast hover:bg-muted hover:text-foreground"
                   >
                     Edit

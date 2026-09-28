@@ -10,6 +10,7 @@ import { FormatBadge } from "@/components/shared/FormatBadge";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import type { ContentBrief } from "@/types/brief";
 import { ApiError } from "@/lib/api/client";
+import { studioHref } from "@/features/studio/lib/studio-routes";
 
 type BriefGeneratePanelProps = {
   brief: ContentBrief;
@@ -32,7 +33,7 @@ export function BriefGeneratePanel({ brief, dirty }: BriefGeneratePanelProps) {
     setError(null);
     try {
       const created = await generateFromBrief(brief.id);
-      router.push(`/studio?format=${created.format}&item=${created.id}`);
+      router.push(studioHref(created));
     } catch (cause) {
       const message =
         cause instanceof ApiError
@@ -87,7 +88,7 @@ export function BriefGeneratePanel({ brief, dirty }: BriefGeneratePanelProps) {
           {generated.map((item) => (
             <li key={item.id}>
               <Link
-                href={`/studio?format=${item.format}&item=${item.id}`}
+                href={studioHref(item)}
                 className="flex flex-wrap items-center gap-2 rounded-control border border-border bg-background px-3 py-2 transition-colors duration-fast hover:border-primary"
               >
                 <span className="min-w-0 flex-1 truncate text-caption font-medium text-foreground">

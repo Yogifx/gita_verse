@@ -29,6 +29,10 @@ export function createDeterministicGenerationPort(): GenerationPort {
           contentGoal: request.contentGoal,
         },
         request.format,
+        {
+          label: request.citation.label,
+          reference: request.citation.reference,
+        },
       );
     },
   };

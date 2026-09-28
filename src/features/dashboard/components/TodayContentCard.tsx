@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { ArrowRight, CalendarDays } from "lucide-react";
+import { ArrowRight, CalendarDays, Sparkles } from "lucide-react";
 import type { ContentItem } from "@/types/content";
 import { PLATFORM_META } from "@/constants/content";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { FormatBadge } from "@/components/shared/FormatBadge";
 import { SectionCard } from "@/components/shared/SectionCard";
 import { formatDayDate } from "@/lib/utils/time";
+import { studioHref, verseCreateHref } from "@/features/studio/lib/studio-routes";
+import { formatReference } from "@/features/knowledge/lib/reference";
 
 type TodayContentCardProps = {
   item: ContentItem | undefined;
@@ -57,7 +59,7 @@ export function TodayContentCard({ item }: TodayContentCardProps) {
             <p className="mt-1 text-body text-foreground">{item.keyLearning}</p>
           </div>
 
-          <div className="mt-auto flex flex-wrap items-center justify-between gap-3 pt-2">
+          <div className="mt-auto flex flex-col gap-3 pt-2">
             <div className="flex flex-wrap gap-1.5">
               {item.platforms.map((platform) => (
                 <span
@@ -68,13 +70,25 @@ export function TodayContentCard({ item }: TodayContentCardProps) {
                 </span>
               ))}
             </div>
-            <Link
-              href={`/studio?format=${item.format}&item=${item.id}`}
-              className="inline-flex items-center gap-2 rounded-control bg-primary px-4 py-2 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
-            >
-              Continue in Studio
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <Link
+                href={studioHref(item)}
+                className="inline-flex items-center gap-2 rounded-control border border-border px-4 py-2 text-caption font-medium text-foreground-secondary transition-colors duration-fast hover:bg-muted hover:text-foreground"
+              >
+                Continue in Studio
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href={verseCreateHref(
+                  formatReference(item.reference.chapter, Number(item.reference.verseLabel) || 47),
+                  "reel",
+                )}
+                className="inline-flex items-center gap-2 rounded-control bg-primary px-4 py-2 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
+              >
+                <Sparkles className="h-4 w-4" />
+                Create content
+              </Link>
+            </div>
           </div>
         </div>
       ) : (

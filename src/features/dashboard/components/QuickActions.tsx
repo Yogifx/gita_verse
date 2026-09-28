@@ -9,21 +9,15 @@ import {
   Images,
   Sparkles,
 } from "lucide-react";
-import { useContentStore } from "@/features/content/store/use-content-store";
 import { QuickActionButton } from "@/features/dashboard/components/QuickActionButton";
 import { SectionCard } from "@/components/shared/SectionCard";
+import { verseCreateHref } from "@/features/studio/lib/studio-routes";
 
 export function QuickActions() {
   const router = useRouter();
-  const createContentItem = useContentStore((s) => s.createContentItem);
 
   function handleNewProject() {
     router.push("/projects");
-  }
-
-  async function handleCreateContent() {
-    const id = await createContentItem("post");
-    router.push(`/studio?item=${id}`);
   }
 
   return (
@@ -37,22 +31,22 @@ export function QuickActions() {
         <QuickActionButton
           label="Create Content"
           icon={Sparkles}
-          onClick={() => void handleCreateContent()}
+          href={verseCreateHref("2.47")}
         />
         <QuickActionButton
           label="Open Carousel Studio"
           icon={GalleryHorizontal}
-          href="/studio?format=carousel"
+          href={verseCreateHref("2.47", "carousel")}
         />
         <QuickActionButton
           label="Open Post Studio"
           icon={ImageIcon}
-          href="/studio?format=post"
+          href={verseCreateHref("2.47", "post")}
         />
         <QuickActionButton
           label="Open Reel Studio"
           icon={Clapperboard}
-          href="/studio?format=reel"
+          href={verseCreateHref("2.47", "reel")}
         />
         <QuickActionButton label="Asset Library" icon={Images} href="/assets" />
       </div>

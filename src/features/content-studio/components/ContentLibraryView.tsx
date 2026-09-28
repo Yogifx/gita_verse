@@ -15,6 +15,7 @@ import { ContentFilterBar } from "@/features/content-studio/components/ContentFi
 import { ContentCard } from "@/features/content-studio/components/ContentCard";
 import { CreateContentDialog } from "@/features/content-studio/components/CreateContentDialog";
 import { WorkspaceLoading } from "@/components/shared/WorkspaceLoading";
+import { verseCreateHref } from "@/features/studio/lib/studio-routes";
 
 export function ContentLibraryView() {
   const items = useContentStore((s) => s.items);
@@ -55,11 +56,17 @@ export function ContentLibraryView() {
           <button
             type="button"
             onClick={() => setCreateOpen(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-control border border-border px-4 py-2.5 text-caption font-medium text-foreground-secondary transition-colors duration-fast hover:bg-muted hover:text-foreground"
+          >
+            Blank piece
+          </button>
+          <Link
+            href={verseCreateHref("2.47", "reel")}
             className="inline-flex items-center justify-center gap-2 rounded-control bg-primary px-4 py-2.5 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
           >
             <Plus className="h-4 w-4" />
             Create Content
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -74,14 +81,13 @@ export function ContentLibraryView() {
               ? "No content yet. Create your first piece to get started."
               : "Nothing matches your search or filter."}
           </p>
-          <button
-            type="button"
-            onClick={() => setCreateOpen(true)}
+          <Link
+            href={verseCreateHref("2.47", "reel")}
             className="inline-flex items-center gap-2 rounded-control bg-primary px-4 py-2 text-caption font-medium text-foreground-on-primary transition-colors duration-fast hover:bg-primary-hover"
           >
             <Plus className="h-4 w-4" />
             Create Content
-          </button>
+          </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
